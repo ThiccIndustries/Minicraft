@@ -1,4 +1,4 @@
-#Random ideas for game
+# Random ideas for game
 * Minicraft type rendering and camera
 * Minecraft style mining / gathering above ground
 * Limited underground (Proc gen caves?)
