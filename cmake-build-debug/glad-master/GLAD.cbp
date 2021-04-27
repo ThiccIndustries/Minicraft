@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="GLAD"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\glad-master\;CMake Files\GLFW\;CMake Files\GLFW\src\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glad">
+				<Option output="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/libglad.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 glad"/>
+					<CompileFile command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glad/fast">
+				<Option output="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/libglad.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 glad/fast"/>
+					<CompileFile command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glad-generate-files">
+				<Option working_dir="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 glad-generate-files"/>
+					<CompileFile command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/include/glad/glad.h">
+			<Option target="glad"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/src/glad.c">
+			<Option target="glad"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/glad-master/src/glad.c.rule">
+			<Option target="glad"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/glad-master/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\glad-master\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\GLFW\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/cmake_uninstall.cmake.in">
+			<Option virtualFolder="CMake Files\GLFW\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\GLFW\src\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/glfw3.pc.in">
+			<Option virtualFolder="CMake Files\GLFW\src\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/glfw3Config.cmake.in">
+			<Option virtualFolder="CMake Files\GLFW\src\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/glfw_config.h.in">
+			<Option virtualFolder="CMake Files\GLFW\src\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

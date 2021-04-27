@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="GLFW"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\glad-master\;CMake Files\GLFW\;CMake Files\GLFW\src\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="uninstall">
+				<Option working_dir="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/Makefile&quot;  VERBOSE=1 uninstall"/>
+					<CompileFile command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glfw">
+				<Option output="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src/libglfw3.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D_GLFW_USE_CONFIG_H"/>
+					<Add directory="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/include"/>
+					<Add directory="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src"/>
+					<Add directory="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src/Makefile&quot;  VERBOSE=1 glfw"/>
+					<CompileFile command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glfw/fast">
+				<Option output="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src/libglfw3.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-D_GLFW_USE_CONFIG_H"/>
+					<Add directory="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/include"/>
+					<Add directory="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src"/>
+					<Add directory="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/x86_64-pc-linux-gnu"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include-fixed"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src/Makefile&quot;  VERBOSE=1 glfw/fast"/>
+					<CompileFile command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j16 -f &quot;/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/include/GLFW/glfw3.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/include/GLFW/glfw3native.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/context.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/egl_context.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/egl_context.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/glx_context.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/glx_context.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/init.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/input.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/internal.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/linux_joystick.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/linux_joystick.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/mappings.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/monitor.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/osmesa_context.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/osmesa_context.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/posix_thread.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/posix_thread.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/posix_time.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/posix_time.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/vulkan.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/window.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/x11_init.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/x11_monitor.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/x11_platform.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/x11_window.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/xkb_unicode.c">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/xkb_unicode.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/GLFW/src/glfw_config.h">
+			<Option target="glfw"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/glad-master/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\glad-master\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\GLFW\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/cmake_uninstall.cmake.in">
+			<Option virtualFolder="CMake Files\GLFW\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\GLFW\src\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/glfw3.pc.in">
+			<Option virtualFolder="CMake Files\GLFW\src\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/glfw3Config.cmake.in">
+			<Option virtualFolder="CMake Files\GLFW\src\"/>
+		</Unit>
+		<Unit filename="/home/trevorskupien/Documents/GitHub/Minicraft/GLFW/src/glfw_config.h.in">
+			<Option virtualFolder="CMake Files\GLFW\src\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
