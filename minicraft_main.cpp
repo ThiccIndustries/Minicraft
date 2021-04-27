@@ -2,7 +2,7 @@
 #include "minicraft.h"
 
 int main(int argc, char* argv[]){
-    GLFWwindow* windowptr = rendering_init_opengl(768, 512, 2);
+    GLFWwindow* windowptr = rendering_init_opengl(768, 512, 3);
 
     std::string path = std::string("/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/terrain.bmp");
 
@@ -17,9 +17,12 @@ int main(int argc, char* argv[]){
 
     int chunk_prev_x;
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
+
+    input_register_callbacks(windowptr);
+
     while(!glfwWindowShouldClose(windowptr)){
-        glfwPollEvents();
+        input_poll_input();
 
         if(chunk_prev_x != camera -> pos_x / 256) {
             world_populate_chunk_buffer(camera);
@@ -30,8 +33,9 @@ int main(int argc, char* argv[]){
         for(int i = 0; i < RENDER_DISTANCE * RENDER_DISTANCE * 4; i++){
             rendering_draw_chunk(ChunkBuffer[i], tex, camera);
         }
-        camera -> pos_x++;
-        camera -> pos_y++;
+
+        //if(input_get_key(GLFW_KEY_D))
+            camera -> pos_x ++;
 
         glfwSwapBuffers(windowptr);
     }

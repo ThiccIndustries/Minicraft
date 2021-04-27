@@ -38,8 +38,8 @@ void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera){
             if(chunk_y + (y * 16) > 512 || chunk_y + (y * 16) < -16)
                 continue;
 
-            uint texture_coord_x = chunk -> foreground_tiles[(y * 16) + x] % (atlas_texture -> width / TEXTURE_TILE_RES);
-            uint texture_coord_y = chunk -> foreground_tiles[(y * 16) + x] / (atlas_texture -> width / TEXTURE_TILE_RES);
+            uint texture_coord_x = BlockRegistry[chunk -> foreground_tiles[(y * 16) + x]] -> atlas_index % (atlas_texture -> width / TEXTURE_TILE_RES);
+            uint texture_coord_y = BlockRegistry[chunk -> foreground_tiles[(y * 16) + x]] -> atlas_index  / (atlas_texture -> width / TEXTURE_TILE_RES);
 
             double texture_uv_x = atlas_texture -> atlas_uv_dx * texture_coord_x;
             double texture_uv_y = atlas_texture -> atlas_uv_dy * texture_coord_y;

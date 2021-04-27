@@ -1,1 +1,0 @@
-/usr/bin/g++  -static-libstdc++ -static-libgcc -g CMakeFiles/Minicraft.dir/minicraft_main.cpp.o CMakeFiles/Minicraft.dir/minicraft_rendering.cpp.o CMakeFiles/Minicraft.dir/mincraft_texture.cpp.o CMakeFiles/Minicraft.dir/minicraft_world.cpp.o -o Minicraft  glad-master/libglad.a GLFW/src/libglfw3.a /usr/lib/librt.so -lm -ldl /usr/lib/libX11.so -lpthread 

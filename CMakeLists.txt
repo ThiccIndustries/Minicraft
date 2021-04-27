@@ -14,5 +14,5 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
 include_directories(${CMAKE_SOURCE_DIR}/GLFW/include ${CMAKE_SOURCE_DIR}/glad-master/include/)
 
 find_package(OpenGL REQUIRED)
-add_executable(Minicraft minicraft.h minicraft_main.cpp minicraft_rendering.cpp mincraft_texture.cpp minicraft_world.cpp PerlinNoise.hpp)
+add_executable(Minicraft minicraft.h minicraft_main.cpp minicraft_rendering.cpp minicraft_texture.cpp minicraft_world.cpp minicraft_input.cpp)
 target_link_libraries(Minicraft glad glfw)

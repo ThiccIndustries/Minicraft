@@ -1,7 +1,17 @@
 #include "minicraft.h"
-#include "PerlinNoise.hpp"
 
 Chunk* ChunkBuffer[RENDER_DISTANCE * RENDER_DISTANCE * 4];
+
+Block* BlockRegistry[255] = {
+        world_construct_block(0, 0, EARTH, 0, 0),   //Grass
+        world_construct_block(3, 0, STONE, 0, 0),   //Stone
+        world_construct_block(8, 0, EARTH, 0, 0),   //Sand
+
+        world_construct_block(4, 0, SOLID, 0, 0),   //Water
+        world_construct_block(5, 0, SOLID, 0, 0),   //Water Grass
+        world_construct_block(6, 0, SOLID, 0, 0),  //Water Stone
+        world_construct_block(7, 0, SOLID, 0, 0),   //Water Sand
+};
 
 void world_populate_chunk_buffer(Camera* cam){
     int player_chunk_x = cam -> pos_x / 256;
@@ -23,9 +33,6 @@ void world_populate_chunk_buffer(Camera* cam){
 }
 
 Chunk* world_load_chunk(int x, int y, int seed){
-
-    siv::PerlinNoise pn(seed);
-
     Chunk* chunkptr = new Chunk;
 
     double perlin_coord_y1, perlin_coord_x, perlin_coord_y;
@@ -37,16 +44,18 @@ Chunk* world_load_chunk(int x, int y, int seed){
             perlin_coord_y = ((x * 256) + ty) * WORLD_PERLIN_SCALE;
             perlin_coord_y1 = ((x * 256) + (ty - 1)) * WORLD_PERLIN_SCALE;
 
-            double chunk_value = pn.noise2D(perlin_coord_x, perlin_coord_y);
-            double chunk_value1 = pn.noise2D(perlin_coord_x, perlin_coord_y1);
+            //double chunk_value = pn.noise2D(perlin_coord_x, perlin_coord_y);
+            //double chunk_value1 = pn.noise2D(perlin_coord_x, perlin_coord_y1);
 
-            if(chunk_value >= WORLD_WATER_SCALE){
+            /*if(chunk_value >= WORLD_WATER_SCALE){
                 if(chunk_value1 >= WORLD_WATER_SCALE)
                     chunkptr -> foreground_tiles[(ty * 16) + tx] = 4;
                 else
                     chunkptr -> foreground_tiles[(ty * 16) + tx] = 5;
             }else
-                chunkptr -> foreground_tiles[(ty * 16) + tx] = 0;
+                chunkptr -> foreground_tiles[(ty * 16) + tx] = 0;*/
+
+            chunkptr -> foreground_tiles[(ty * 16) + tx] = (x + y) % 2 == 0 ? 0 : 2;
 
         }
     }
@@ -59,4 +68,16 @@ Chunk* world_load_chunk(int x, int y, int seed){
 void world_unload_chunk(Chunk* chunk){
     //TODO: save chunks to file
     delete chunk;
+}
+
+Block* world_construct_block(uint id, uchar options, Material mat, uint drop_id, uint drop_count){
+    Block* blockptr = new Block;
+
+    blockptr -> atlas_index = id;
+    blockptr -> options     = options;
+    blockptr -> material    = mat;
+    blockptr -> drop_id     = drop_id;
+    blockptr -> drop_count  = drop_count;
+
+    return blockptr;
 }
