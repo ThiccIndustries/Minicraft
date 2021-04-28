@@ -33,9 +33,9 @@ void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera){
     for(int y = 0; y < 16; y++){
         for(int x = 0; x < 16; x++){
 
-            if(chunk_x + (x * 16) > 768 || chunk_x + (x * 16) < -16)
+            if(chunk_x + (x * 16) > RENDER_WINX || chunk_x + (x * 16) < -16)
                 continue;
-            if(chunk_y + (y * 16) > 512 || chunk_y + (y * 16) < -16)
+            if(chunk_y + (y * 16) > RENDER_WINY || chunk_y + (y * 16) < -16)
                 continue;
 
             uint texture_coord_x = BlockRegistry[chunk -> foreground_tiles[(y * 16) + x]] -> atlas_index % (atlas_texture -> width / TEXTURE_TILE_RES);
@@ -57,4 +57,19 @@ void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera){
 
         }
     }
+}
+
+Coord2d* rendering_viewport_to_world_pos(GLFWwindow* window, Camera* cam, double x, double y){
+
+    //Get viewport scale
+    int width, scale;
+    glfwGetWindowSize(window, &width, nullptr);
+    scale = width / RENDER_WINX;
+
+    Coord2d* pos = new Coord2d;
+
+    pos -> x = (x / scale) + cam -> pos_x;
+    pos -> y = (y / scale) + cam -> pos_y;
+
+    return pos;
 }

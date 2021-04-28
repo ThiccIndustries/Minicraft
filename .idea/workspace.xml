@@ -16,8 +16,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="275c6b71-19aa-4f17-ba59-1f72b692ed0c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minicraft.h" beforeDir="false" afterPath="$PROJECT_DIR$/minicraft.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minicraft_main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/minicraft_main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minicraft_rendering.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/minicraft_rendering.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minicraft_world.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/minicraft_world.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,11 +62,6 @@
     <option name="showLigatures" value="true" />
   </component>
   <component name="RunManager" selected="CMake Application.Minicraft">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Minicraft" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Minicraft" TARGET_NAME="Minicraft" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Minicraft" RUN_TARGET_NAME="Minicraft">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -87,11 +85,6 @@
     <configuration name="uninstall" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Minicraft" TARGET_NAME="uninstall" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <list>
@@ -118,6 +111,11 @@
       <workItem from="1619527682306" duration="5000" />
       <workItem from="1619527702021" duration="1000" />
       <workItem from="1619527740302" duration="3316000" />
+      <workItem from="1619538760683" duration="1759000" />
+      <workItem from="1619543625687" duration="64000" />
+      <workItem from="1619546183663" duration="737000" />
+      <workItem from="1619567839956" duration="323000" />
+      <workItem from="1619575956848" duration="64000" />
     </task>
     <servers />
   </component>

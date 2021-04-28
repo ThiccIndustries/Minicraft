@@ -4,7 +4,7 @@ Chunk* ChunkBuffer[RENDER_DISTANCE * RENDER_DISTANCE * 4];
 
 Block* BlockRegistry[255] = {
         world_construct_block(0, 0, EARTH, 0, 0),   //Grass
-        world_construct_block(3, 0, STONE, 0, 0),   //Stone
+        world_construct_block(2, 0, STONE, 0, 0),   //Stone
         world_construct_block(8, 0, EARTH, 0, 0),   //Sand
 
         world_construct_block(4, 0, SOLID, 0, 0),   //Water
@@ -24,10 +24,10 @@ void world_populate_chunk_buffer(Camera* cam){
             int chunk_y = player_chunk_y - (y - RENDER_DISTANCE);
             int chunki = x + (y * RENDER_DISTANCE * 2);
 
-            if(ChunkBuffer[chunki] == nullptr || ChunkBuffer[chunki] -> pos_x != chunk_x || ChunkBuffer[chunki] -> pos_x != chunk_y){
+            //if(ChunkBuffer[chunki] == nullptr || ChunkBuffer[chunki] -> pos_x != chunk_x || ChunkBuffer[chunki] -> pos_x != chunk_y){
                 world_unload_chunk(ChunkBuffer[chunki]);
                 ChunkBuffer[chunki] = world_load_chunk(chunk_x, chunk_y, 0);
-            }
+            //}
         }
     }
 }
@@ -44,17 +44,6 @@ Chunk* world_load_chunk(int x, int y, int seed){
             perlin_coord_y = ((x * 256) + ty) * WORLD_PERLIN_SCALE;
             perlin_coord_y1 = ((x * 256) + (ty - 1)) * WORLD_PERLIN_SCALE;
 
-            //double chunk_value = pn.noise2D(perlin_coord_x, perlin_coord_y);
-            //double chunk_value1 = pn.noise2D(perlin_coord_x, perlin_coord_y1);
-
-            /*if(chunk_value >= WORLD_WATER_SCALE){
-                if(chunk_value1 >= WORLD_WATER_SCALE)
-                    chunkptr -> foreground_tiles[(ty * 16) + tx] = 4;
-                else
-                    chunkptr -> foreground_tiles[(ty * 16) + tx] = 5;
-            }else
-                chunkptr -> foreground_tiles[(ty * 16) + tx] = 0;*/
-
             chunkptr -> foreground_tiles[(ty * 16) + tx] = (x + y) % 2 == 0 ? 0 : 2;
 
         }
@@ -68,6 +57,23 @@ Chunk* world_load_chunk(int x, int y, int seed){
 void world_unload_chunk(Chunk* chunk){
     //TODO: save chunks to file
     delete chunk;
+}
+
+void world_modify_chunk(int cx, int cy, int tx, int ty, int value){
+    //Look for chunk in chunk buffer
+    Chunk* chunkptr;
+    std::cout << "chunk:" << cx << " " << cy << std::endl;
+    for(Chunk* c : ChunkBuffer){
+        if(c -> pos_x == cx && c -> pos_y == cy){
+            chunkptr = c;
+            break;
+        }
+    }
+
+    //Chunk isn't loaded
+    if(chunkptr == nullptr){ return; }
+
+    chunkptr -> foreground_tiles[tx + (ty * 16)] = value;
 }
 
 Block* world_construct_block(uint id, uchar options, Material mat, uint drop_id, uint drop_count){

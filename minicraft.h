@@ -10,6 +10,8 @@
 #include "iostream"
 
 #define RENDER_DISTANCE 3
+#define RENDER_WINX 240
+#define RENDER_WINY 160
 
 #define WORLD_PERLIN_SCALE 0.05
 #define WORLD_WATER_SCALE 0.25
@@ -67,6 +69,10 @@ typedef struct{
     uint foreground_tiles[16 * 16]; //Overlay tiles
 }Chunk;
 
+typedef struct{
+    double x, y;
+}Coord2d;
+
 /*--- minicraft_world.cpp ---*/
 extern Chunk* ChunkBuffer[];
 extern Block* BlockRegistry[];
@@ -88,11 +94,13 @@ void        texture_bind(Texture* t, GLuint sampler);                   //Bind t
 void    world_unload_chunk(Chunk* chunk);                                       //Safely save and delete Chunk
 Chunk*  world_load_chunk(int x, int y, int seed);                               //Load or generate Chunk
 void    world_populate_chunk_buffer(Camera* cam);                               //Populate Chunk Buffer
+void    world_modify_chunk(int cx, int cy, int tx, int ty, int value);          //Set tile of chunk to value
 Block*  world_construct_block(uint atlas_index, uchar options, Material mat,
                               uint drop_id, uint drop_count);                   //Build new Chunk Struct
 
-GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale);            //Init OpenGL, GLFW, and create window
-void        rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera); //Draw a chunk
+GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale);                        //Init OpenGL, GLFW, and create window
+void        rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera);             //Draw a chunk
+Coord2d*    rendering_viewport_to_world_pos(GLFWwindow* window, Camera* cam, double x, double y);   //Get world position of viewport position
 
 void input_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);   //Keyboard callback
 void input_mouse_button_callback(GLFWwindow* window, int button, int actions, int mods);    //Mouse button callback
