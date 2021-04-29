@@ -1,6 +1,7 @@
-//
-// Created by trevorskupien on 4/27/21.
-//
+/*
+ * Created by MajesticWaffle on 4/27/21.
+ * Copyright (c) 2021 Thicc Industries. All rights reserved.
+ */
 
 #include "minicraft.h"
 

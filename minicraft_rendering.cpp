@@ -1,3 +1,8 @@
+/*
+ * Created by MajesticWaffle on 4/26/21.
+ * Copyright (c) 2021 Thicc Industries. All rights reserved.
+ */
+
 #include "minicraft.h"
 
 GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale){
@@ -13,7 +18,7 @@ GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale){
 
     GLFWwindow* windowptr = glfwCreateWindow(window_x * scale, window_y * scale, "Minicraft", nullptr, nullptr);
     glfwMakeContextCurrent(windowptr);
-    gladLoadGLLoader( (GLADloadproc) glfwGetProcAddress);
+    glewInit();
 
     //Set up ortho projection
     glMatrixMode(GL_PROJECTION);
@@ -27,8 +32,8 @@ GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale){
 
 void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera){
 
-    int chunk_x = chunk -> pos_x * (16 * 16) - camera -> pos_x;
-    int chunk_y = chunk -> pos_y * (16 * 16) - camera -> pos_y;
+    int chunk_x = chunk -> pos_x * (16 * 16) - (int)camera -> position.x;
+    int chunk_y = chunk -> pos_y * (16 * 16) - (int)camera -> position.y;
 
     for(int y = 0; y < 16; y++){
         for(int x = 0; x < 16; x++){
@@ -59,17 +64,23 @@ void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera){
     }
 }
 
-Coord2d* rendering_viewport_to_world_pos(GLFWwindow* window, Camera* cam, double x, double y){
+void rendering_draw_chunk_buffer(Texture* atlas_texture, Camera* camera){
+    for(int i = 0; i < RENDER_DISTANCE * RENDER_DISTANCE * 4; ++i){
+        rendering_draw_chunk(ChunkBuffer[i], atlas_texture, camera);
+    }
+}
+
+Coord2d rendering_viewport_to_world_pos(GLFWwindow* window, Camera* cam, double x, double y){
 
     //Get viewport scale
     int width, scale;
     glfwGetWindowSize(window, &width, nullptr);
     scale = width / RENDER_WINX;
 
-    Coord2d* pos = new Coord2d;
+    Coord2d position;
 
-    pos -> x = (x / scale) + cam -> pos_x;
-    pos -> y = (y / scale) + cam -> pos_y;
+    position.x = (x / scale) + cam -> position.x;
+    position.y = (y / scale) + cam -> position.y;
 
-    return pos;
+    return position;
 }

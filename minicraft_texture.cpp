@@ -1,3 +1,8 @@
+/*
+ * Created by MajesticWaffle on 4/27/21.
+ * Copyright (c) 2021 Thicc Industries. All rights reserved.
+ */
+
 #include "minicraft.h"
 
 Texture* texture_generate(Image* img, uchar texture_load_options){

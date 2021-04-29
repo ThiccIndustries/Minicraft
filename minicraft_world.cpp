@@ -1,3 +1,8 @@
+/*
+ * Created by MajesticWaffle on 4/26/21.
+ * Copyright (c) 2021 Thicc Industries. All rights reserved.
+ */
+
 #include "minicraft.h"
 
 Chunk* ChunkBuffer[RENDER_DISTANCE * RENDER_DISTANCE * 4];
@@ -13,9 +18,15 @@ Block* BlockRegistry[255] = {
         world_construct_block(7, 0, SOLID, 0, 0),   //Water Sand
 };
 
+Item* ItemRegistry[255] = {
+        nullptr,    //ItemRegistry[0] reserved for empty storage slots
+
+};
+
 void world_populate_chunk_buffer(Camera* cam){
-    int player_chunk_x = cam -> pos_x / 256;
-    int player_chunk_y = cam -> pos_y / 256;
+
+    int player_chunk_x = (int)cam -> position.x / 256;
+    int player_chunk_y = (int)cam -> position.y / 256;
 
     for(int x = 0; x < RENDER_DISTANCE * 2; x++){
         for(int y = 0; y < RENDER_DISTANCE * 2; y++){
@@ -24,10 +35,11 @@ void world_populate_chunk_buffer(Camera* cam){
             int chunk_y = player_chunk_y - (y - RENDER_DISTANCE);
             int chunki = x + (y * RENDER_DISTANCE * 2);
 
-            //if(ChunkBuffer[chunki] == nullptr || ChunkBuffer[chunki] -> pos_x != chunk_x || ChunkBuffer[chunki] -> pos_x != chunk_y){
-                world_unload_chunk(ChunkBuffer[chunki]);
-                ChunkBuffer[chunki] = world_load_chunk(chunk_x, chunk_y, 0);
-            //}
+            if(ChunkBuffer[chunki] != nullptr && ChunkBuffer[chunki]->pos_x == chunk_x && ChunkBuffer[chunki]->pos_y == chunk_y)
+                continue;
+
+            world_unload_chunk(ChunkBuffer[chunki]);
+            ChunkBuffer[chunki] = world_load_chunk(chunk_x, chunk_y, 0);
         }
     }
 }
@@ -62,7 +74,8 @@ void world_unload_chunk(Chunk* chunk){
 void world_modify_chunk(int cx, int cy, int tx, int ty, int value){
     //Look for chunk in chunk buffer
     Chunk* chunkptr;
-    std::cout << "chunk:" << cx << " " << cy << std::endl;
+    std::cout << "chunk: " << cx << " " << cy << std::endl;
+    std::cout << "tile: " << tx << " " << ty << std::endl;
     for(Chunk* c : ChunkBuffer){
         if(c -> pos_x == cx && c -> pos_y == cy){
             chunkptr = c;
@@ -71,7 +84,9 @@ void world_modify_chunk(int cx, int cy, int tx, int ty, int value){
     }
 
     //Chunk isn't loaded
-    if(chunkptr == nullptr){ return; }
+    if(chunkptr == nullptr){
+        return;
+    }
 
     chunkptr -> foreground_tiles[tx + (ty * 16)] = value;
 }

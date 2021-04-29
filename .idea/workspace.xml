@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
     <generated>
-      <config projectName="Minicraft" targetName="glfw" />
-      <config projectName="Minicraft" targetName="glad" />
-      <config projectName="Minicraft" targetName="uninstall" />
       <config projectName="Minicraft" targetName="Minicraft" />
-      <config projectName="Minicraft" targetName="glad-generate-files" />
     </generated>
   </component>
   <component name="CMakeSettings">
@@ -16,10 +15,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="275c6b71-19aa-4f17-ba59-1f72b692ed0c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minicraft_entity.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minicraft_player.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/minicraft_time.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/minicraft.h" beforeDir="false" afterPath="$PROJECT_DIR$/minicraft.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minicraft_input.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/minicraft_input.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/minicraft_main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/minicraft_main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/minicraft_rendering.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/minicraft_rendering.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/minicraft_texture.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/minicraft_texture.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/minicraft_world.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/minicraft_world.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -51,49 +57,33 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
     <property name="cidr.known.project.marker" value="true" />
     <property name="cmake.loaded.for.project" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="CPPToolchains" />
+    <property name="settings.editor.selected.configurable" value="fileTemplates" />
   </component>
   <component name="ReaderModeSettings">
     <option name="showLigatures" value="true" />
   </component>
-  <component name="RunManager" selected="CMake Application.Minicraft">
+  <component name="RunManager">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Minicraft" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Minicraft" TARGET_NAME="Minicraft" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Minicraft" RUN_TARGET_NAME="Minicraft">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="glad-generate-files" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Minicraft" TARGET_NAME="glad-generate-files" CONFIG_NAME="Debug">
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="glad" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Minicraft" TARGET_NAME="glad" CONFIG_NAME="Debug">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="glfw" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Minicraft" TARGET_NAME="glfw" CONFIG_NAME="Debug">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="uninstall" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Minicraft" TARGET_NAME="uninstall" CONFIG_NAME="Debug">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="CMake Application.Minicraft" />
-      <item itemvalue="CMake Application.glad-generate-files" />
-      <item itemvalue="CMake Application.glad" />
-      <item itemvalue="CMake Application.glfw" />
-      <item itemvalue="CMake Application.uninstall" />
-    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -116,6 +106,8 @@
       <workItem from="1619546183663" duration="737000" />
       <workItem from="1619567839956" duration="323000" />
       <workItem from="1619575956848" duration="64000" />
+      <workItem from="1619662155192" duration="483000" />
+      <workItem from="1619711434622" duration="5920000" />
     </task>
     <servers />
   </component>

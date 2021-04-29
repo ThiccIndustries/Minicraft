@@ -1,23 +1,29 @@
-#include <cstring>
+/*
+ * Created by MajesticWaffle on 4/26/21.
+ * Copyright (c) 2021 Thicc Industries. All rights reserved.
+ */
+
 #include "minicraft.h"
 
 int main(int argc, char* argv[]){
     GLFWwindow* windowptr = rendering_init_opengl(RENDER_WINX, RENDER_WINY, 4);
 
-    std::string path = std::string("/home/trevorskupien/Documents/GitHub/Minicraft/cmake-build-debug/terrain.bmp");
+    std::string game_path(argv[0]);
+    int lastDir = game_path.find_last_of('/');
+
+    std::string path = game_path.substr(0, lastDir) + "/terrain.bmp";
 
     std::cout << path.c_str() << std::endl;
     Image* img = texture_load_bmp(path.c_str());
     Texture* tex = texture_generate(img, TEXTURE_MULTIPLE);
     std::cout << tex->atlas_uv_dy << " " << tex->atlas_uv_dx << std::endl;
 
-    Camera* camera = new Camera;
-    camera -> pos_x = 0;
-    camera -> pos_y = 0;
+    Entity_Player* player = new Entity_Player;
 
-    int chunk_prev_x;
-    int chunk_prev_y;
+    entity_register_entity((Entity*)player);
+    player -> camera = new Camera;
 
+    std::cout << ((Entity*)player) -> id << std::endl;
     glfwSwapInterval(0);
 
     input_register_callbacks(windowptr);
@@ -26,27 +32,20 @@ int main(int argc, char* argv[]){
 
     while(!glfwWindowShouldClose(windowptr)){
         input_poll_input();
+        time_update_time(glfwGetTime());
 
-        if(chunk_prev_x != camera -> pos_x / 256 || chunk_prev_y != camera -> pos_y / 256) {
-            world_populate_chunk_buffer(camera);
-            chunk_prev_x = camera -> pos_x / 256;
-            chunk_prev_y = camera -> pos_y / 256;
-            //std::cout << "x: " << camera -> pos_x << " y: " << camera -> pos_y << std::endl;
-        }
+        //std::cout << time_get_framerate() << std::endl;
 
-        for(int i = 0; i < RENDER_DISTANCE * RENDER_DISTANCE * 4; i++){
-            rendering_draw_chunk(ChunkBuffer[i], tex, camera);
-        }
+        world_populate_chunk_buffer(player -> camera);
+        rendering_draw_chunk_buffer(tex, player -> camera);
 
         if(input_get_button(GLFW_MOUSE_BUTTON_1)){
-            Coord2d* worldspace_pos = rendering_viewport_to_world_pos(windowptr, camera, m_posx, m_posy);
-            int cx = (int)worldspace_pos -> x / 256;
-            int cy = (int)worldspace_pos -> y / 256;
+            Coord2d worldspace_pos = rendering_viewport_to_world_pos(windowptr, player -> camera, m_posx, m_posy);
+            int cx = (int)worldspace_pos.x / 256;
+            int cy = (int)worldspace_pos.y / 256;
 
-            std::cout << worldspace_pos -> x << " " << worldspace_pos -> y << std::endl;
-
-            int ty = ((int)worldspace_pos -> x % 256) / 16;
-            int tx = ((int)worldspace_pos -> y % 256) / 16;
+            int ty = ((int)worldspace_pos.x % 256) / 16;
+            int tx = ((int)worldspace_pos.y % 256) / 16;
 
             world_modify_chunk(cx, cy, ty, tx, index);
         }
@@ -58,8 +57,9 @@ int main(int argc, char* argv[]){
             index++;
         }
 
-        camera -> pos_x += (input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0);
-        camera -> pos_y += (input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0);
+        player -> camera -> position.x += ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0)) * mTime -> delta * 256;
+        player -> camera -> position.y += ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0)) * mTime -> delta * 256;
+
         glfwSwapBuffers(windowptr);
     }
 
