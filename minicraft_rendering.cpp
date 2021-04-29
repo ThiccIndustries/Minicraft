@@ -32,8 +32,8 @@ GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale){
 
 void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera){
 
-    int chunk_x = chunk -> pos_x * (16 * 16) - (int)camera -> position.x;
-    int chunk_y = chunk -> pos_y * (16 * 16) - (int)camera -> position.y;
+    double chunk_x = chunk -> pos_x * (16 * 16) - camera -> position.x;
+    double chunk_y = chunk -> pos_y * (16 * 16) - camera -> position.y;
 
     for(int y = 0; y < 16; y++){
         for(int x = 0; x < 16; x++){
@@ -52,10 +52,10 @@ void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera){
             texture_bind(atlas_texture, 0);
             glEnable(GL_TEXTURE_2D);
             glBegin(GL_QUADS);{
-                glTexCoord2d(texture_uv_x,                                  texture_uv_y);                                  glVertex2i(chunk_x + (x * 16),        chunk_y + (y * 16));
-                glTexCoord2d(texture_uv_x + atlas_texture -> atlas_uv_dx,   texture_uv_y);                                  glVertex2i(chunk_x + (x * 16) + 16,   chunk_y + (y * 16));
-                glTexCoord2d(texture_uv_x + atlas_texture -> atlas_uv_dx,   texture_uv_y + atlas_texture -> atlas_uv_dy);   glVertex2i(chunk_x + (x * 16) + 16,   chunk_y + (y * 16) + 16);
-                glTexCoord2d(texture_uv_x,                                  texture_uv_y + atlas_texture -> atlas_uv_dy);   glVertex2i(chunk_x + (x * 16),        chunk_y + (y * 16) + 16);
+                glTexCoord2d(texture_uv_x,                                  texture_uv_y);                                  glVertex2d(chunk_x + (x * 16),        chunk_y + (y * 16));
+                glTexCoord2d(texture_uv_x + atlas_texture -> atlas_uv_dx,   texture_uv_y);                                  glVertex2d(chunk_x + (x * 16) + 16,   chunk_y + (y * 16));
+                glTexCoord2d(texture_uv_x + atlas_texture -> atlas_uv_dx,   texture_uv_y + atlas_texture -> atlas_uv_dy);   glVertex2d(chunk_x + (x * 16) + 16,   chunk_y + (y * 16) + 16);
+                glTexCoord2d(texture_uv_x,                                  texture_uv_y + atlas_texture -> atlas_uv_dy);   glVertex2d(chunk_x + (x * 16),        chunk_y + (y * 16) + 16);
             }
             glEnd();
             glDisable(GL_TEXTURE_2D);

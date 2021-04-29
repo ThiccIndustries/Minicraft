@@ -35,8 +35,7 @@ Texture* texture_generate(Image* img, uchar texture_load_options){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
     glBindTexture(GL_TEXTURE_2D, 0);
-
-    std::cout << textureptr -> width << " " << textureptr -> height << std::endl;
+    
     return textureptr;
 }
 
@@ -49,13 +48,13 @@ Image* texture_load_bmp(const char* path){
     //Open file
     FILE* file = fopen(path, "rb");
     if(!file){
-        std::cout << "test0" << std::endl;
+        std::cout << "test0" << std::endl;  //TODO: Handle this
         return nullptr;
     }
 
     //Read 54 bytes -> header
     if(fread(header, 1, 54, file) != 54) {
-        std::cout << "test1" << std::endl;
+        std::cout << "test1" << std::endl;  //TODO: Handle this
         return nullptr;
     };
 
@@ -67,7 +66,7 @@ Image* texture_load_bmp(const char* path){
 
     //BMP must be 255 colors palletized
     if(colorType != 24){
-        std::cout << colorType << " test2" << std::endl;
+        std::cout << colorType << " test2" << std::endl;  //TODO: Handle this
         return nullptr;
     }
 

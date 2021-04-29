@@ -5,16 +5,25 @@
 
 #include "minicraft.h"
 
-Entity* entity_registry[ENTITY_MAX];
+Entity* EntityRegistry[ENTITY_MAX];
 
-void entity_register_entity(Entity* entity){
+Entity* entity_create(Entity* entity){
+
     for(int i = 0; i < ENTITY_MAX; ++i){
-        std::cout << i << std::endl;
-        if(entity_registry[i] == nullptr){
+        if(EntityRegistry[i] == nullptr){
             entity -> id = i;
-            entity_registry[i] = entity;
+            EntityRegistry[i] = entity;
             break;
         }
     }
+
+    return entity;
+}
+
+//Safely delete Entity pointer while also cleaning entity_registry
+void entity_delete(uint id){
+
+    delete EntityRegistry[id];
+    EntityRegistry[id] = nullptr;
 }
 
