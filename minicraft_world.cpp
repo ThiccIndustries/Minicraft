@@ -13,10 +13,10 @@ Block* g_block_registry[255] = {
         world_construct_block(2, 0, MAT_STONE, 0, 0),   //Stone
         world_construct_block(8, 0, MAT_EARTH, 0, 0),   //Sand
 
-        world_construct_block(4, 0, MAT_SOLID, 0, 0),   //Water
-        world_construct_block(5, 0, MAT_SOLID, 0, 0),   //Water Grass
-        world_construct_block(6, 0, MAT_SOLID, 0, 0),  //Water Stone
-        world_construct_block(7, 0, MAT_SOLID, 0, 0),   //Water Sand
+        world_construct_block(4, TILE_SOLID, MAT_SOLID, 0, 0),   //Water
+        world_construct_block(5, TILE_SOLID, MAT_SOLID, 0, 0),   //Water Grass
+        world_construct_block(6, TILE_SOLID, MAT_SOLID, 0, 0),  //Water Stone
+        world_construct_block(7, TILE_SOLID, MAT_SOLID, 0, 0),   //Water Sand
 };
 
 Item* g_item_registry[255] = {

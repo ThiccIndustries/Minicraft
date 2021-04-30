@@ -7,21 +7,20 @@
 #include <cmath>
 
 std::string g_game_path;
-
 int main(int argc, char* argv[]){
-    g_game_path = argv[0];
 
+    g_game_path = argv[0];
     std::string saveName = "test";
 
     GLFWwindow* windowptr = rendering_init_opengl(RENDER_WINX, RENDER_WINY, RENDER_SCALE);
 
-    //Having to create an Image* then pass it to create a Texture* is dumb.
+    //Load textures
     //TODO: Unify this. (Why would you ever need an Image and NOT a Texture)
     Image* img = texture_load_bmp(get_resource_path(g_game_path, "terrain.bmp").c_str());
     Texture* tex = texture_generate(img, TEXTURE_MULTIPLE);
 
-    //Create player
-    Entity_Player* player = (Entity_Player*) entity_create((Entity*)new Entity_Player);
+    Entity_Player* player = (Entity_Player*) entity_create((Entity*)new Entity_Player); //Entity 0
+    Camera* active_camera = &player -> camera;  //Poiter to active rendering camera
 
     //Disable Vsync
     glfwSwapInterval(0);
@@ -34,11 +33,14 @@ int main(int argc, char* argv[]){
         input_poll_input();
         time_update_time(glfwGetTime());
 
-        world_populate_chunk_buffer(saveName, &player -> camera);
-        rendering_draw_chunk_buffer(tex, &player -> camera);
-
+        world_populate_chunk_buffer(saveName,   active_camera);
+        rendering_draw_chunk_buffer(tex,        active_camera);
+        rendering_draw_entity((Entity*)player,  active_camera);
+        std::cout << time_get_framerate() << std::endl;
+        entity_tick();
+        glEnd();
         if(input_get_button(GLFW_MOUSE_BUTTON_1)){
-            Coord2d worldspace_pos = rendering_viewport_to_world_pos(windowptr, &player -> camera, g_m_pos );
+            Coord2d worldspace_pos = rendering_viewport_to_world_pos(active_camera, g_m_pos);
 
             Coord2i chunk{ (int)floor(worldspace_pos.x / 256.0),
                            (int)floor(worldspace_pos.y / 256.0) };
@@ -57,8 +59,8 @@ int main(int argc, char* argv[]){
             index++;
         }
 
-        player -> camera.position.x += ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0)) * g_time -> delta * 256;
-        player -> camera.position.y += ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0)) * g_time -> delta * 256;
+        player -> e.position.x += ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0)) * g_time -> delta * (5.612 * 16);
+        player -> e.position.y += ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0)) * g_time -> delta * (5.612 * 16);
 
         glfwSwapBuffers(windowptr);
     }

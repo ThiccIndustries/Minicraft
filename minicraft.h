@@ -13,10 +13,10 @@
 
 /*--- Settings, bitflags, and selectors ---*/
 
-#define RENDER_SCALE 2
+#define RENDER_SCALE 4
 #define RENDER_DISTANCE 3
-#define RENDER_WINX 480
-#define RENDER_WINY 320
+#define RENDER_WINX 240
+#define RENDER_WINY 160
 
 #define WORLD_PERLIN_SCALE 0.05
 #define WORLD_WATER_SCALE 0.25
@@ -54,13 +54,18 @@ typedef unsigned char uchar; //Shorthand unsigned char type
 
 //2D double coordinate
 typedef struct Coord2d{
-    double x = 0, y = 0;
+    double x, y;
 }Coord2d;
 
 //2D integer coordinate
 typedef struct Coord2i{
-    int x = 0, y = 0;
+    int x, y;
 }Coord2i;
+
+typedef struct VideoMode{
+    Coord2i viewport;
+    int scale;
+}VideoMode;
 
 //TODO: This seems pointless, is it gonna have anything added?
 //Camera struct for player entity
@@ -101,24 +106,24 @@ typedef struct Item{
 //All Entity types must contain an Entity member 'e' as their first member
 typedef struct Entity{
     uint id;            //id of the entity in g_entity_registry
-    Coord2i position;   //position of the Entity
+    Coord2d position;   //position of the Entity
     EntityType type;    //Type enum of Entity. Def. ENT_GENERIC
 }Entity;
 
 //Player entity
 typedef struct Entity_Player{
-    Entity e{e.type = ENT_PLAYER};          //Entity inheritance
-    Camera camera;                          //Player camera
+    Entity e{e.type = ENT_PLAYER};                      //Entity inheritance
+    Camera camera{{0, 0}};                              //Player camera
     //TODO: Replace this with a universal storage system probably
-    uchar item_v[PLAYER_INVENTORY_SIZE]{};  //Item slot ids
-    uchar item_c[PLAYER_INVENTORY_SIZE]{};  //Item slot counts
+    uchar item_v[PLAYER_INVENTORY_SIZE]{};              //Item slot ids
+    uchar item_c[PLAYER_INVENTORY_SIZE]{};              //Item slot counts
 
 }Entity_Player;
 
 //World chunk
 typedef struct Chunk{
-    int pos_x = 0;                  //Chunk coordinates
-    int pos_y = 0;                  //-----------------
+    int pos_x ;                     //Chunk coordinates
+    int pos_y;                      //-----------------
     uchar overlay_tiles[256]{};     //Base tiles
     uchar foreground_tiles[256]{};  //Overlay tiles
 }Chunk;
@@ -147,10 +152,14 @@ extern int g_m_actions[]; //GLFW mouse button actions
 extern Coord2d g_m_pos;   //Mouse position
 
 //minicraft_entity.cpp
-extern Entity* g_entity_registry[]; //All active entities
+extern Entity*  g_entity_registry[]; //All active entities
+extern uint     g_entity_highest_id; //The highest entity ID active in g_entity_registry
 
 //minicraft_main.cpp
 extern std::string g_game_path; //Global reference to argv[0]
+
+//minicraft_rendering.cpp
+extern VideoMode g_video_mode;
 
 /*--- Functions ---*/
 
@@ -169,8 +178,9 @@ void    world_chunkfile_write(const std::string& savename, Chunk* chunk);       
 
 GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale);                //Init OpenGL, GLFW, and create window
 void        rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera);     //Draw a chunk
+void        rendering_draw_entity(Entity* entity, Camera* camera);                          //Draw an entity
 void        rendering_draw_chunk_buffer(Texture* atlas_texture, Camera* camera);            //Draw the chunk buffer
-Coord2d     rendering_viewport_to_world_pos(GLFWwindow* window, Camera* cam, Coord2d pos);  //Get world position of viewport position
+Coord2d     rendering_viewport_to_world_pos(Camera* cam, Coord2d pos);                      //Get world position of viewport position
 
 void input_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);   //Keyboard callback
 void input_mouse_button_callback(GLFWwindow* window, int button, int actions, int mods);    //Mouse button callback
@@ -188,6 +198,7 @@ int  time_get_framerate();                  //Get FPS
 
 Entity* entity_create(Entity* entity);      //Add entity to entity_registry and assign id. Returns pointer address for convenience
 void    entity_delete(uint id);             //Removes entity to entity_registry and deletes Entity
+void    entity_tick();                      //Ticks all entities
 
 int player_inventory_add_item(Entity_Player* player, uint item_id, uint item_count);
 
