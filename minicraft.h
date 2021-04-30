@@ -13,9 +13,10 @@
 
 /*--- Settings, bitflags, and selectors ---*/
 
+#define RENDER_SCALE 2
 #define RENDER_DISTANCE 3
-#define RENDER_WINX 240
-#define RENDER_WINY 160
+#define RENDER_WINX 480
+#define RENDER_WINY 320
 
 #define WORLD_PERLIN_SCALE 0.05
 #define WORLD_WATER_SCALE 0.25
@@ -29,8 +30,6 @@
 #define TILE_SOLID       0x03
 
 #define ENTITY_MAX 0xFF
-#define ENTITY_GENERIC 0
-#define ENTITY_PLAYER  1
 
 #define PLAYER_INVENTORY_SIZE       256
 #define PLAYER_INVENTORY_STACK_SIZE 64
@@ -49,6 +48,7 @@ enum EntityType{
     ENT_GENERIC,
     ENT_PLAYER
 };
+
 typedef unsigned int  uint; //Shorthand unsigned int type
 typedef unsigned char uchar; //Shorthand unsigned char type
 
@@ -100,9 +100,9 @@ typedef struct Item{
 
 //All Entity types must contain an Entity member 'e' as their first member
 typedef struct Entity{
-    uint id;            //id of the entity in EntityRegistry
+    uint id;            //id of the entity in g_entity_registry
     Coord2i position;   //position of the Entity
-    EntityType type;
+    EntityType type;    //Type enum of Entity. Def. ENT_GENERIC
 }Entity;
 
 //Player entity
@@ -110,8 +110,8 @@ typedef struct Entity_Player{
     Entity e{e.type = ENT_PLAYER};          //Entity inheritance
     Camera camera;                          //Player camera
     //TODO: Replace this with a universal storage system probably
-    uint item_v[PLAYER_INVENTORY_SIZE]{};   //Item slot ids
-    uint item_c[PLAYER_INVENTORY_SIZE]{};   //Item slot counts
+    uchar item_v[PLAYER_INVENTORY_SIZE]{};  //Item slot ids
+    uchar item_c[PLAYER_INVENTORY_SIZE]{};  //Item slot counts
 
 }Entity_Player;
 
@@ -119,8 +119,8 @@ typedef struct Entity_Player{
 typedef struct Chunk{
     int pos_x = 0;                  //Chunk coordinates
     int pos_y = 0;                  //-----------------
-    uint overlay_tiles[256]{};      //Base tiles
-    uint foreground_tiles[256]{};   //Overlay tiles
+    uchar overlay_tiles[256]{};     //Base tiles
+    uchar foreground_tiles[256]{};  //Overlay tiles
 }Chunk;
 
 typedef struct Time{
@@ -131,65 +131,57 @@ typedef struct Time{
 
 /*--- Global objects and registries ---*/
 
-    //Loc: minicraft_time.cpp
+//minicraft_time.cpp
+extern Time* g_time; //Global time object
 
-extern Time* mTime; //Global time object
+//minicraft_world.cpp
+extern Chunk* g_chunk_buffer[];    //Contains loaded chunks
+extern Block* g_block_registry[];  //Contains all Block types
+extern Item*  g_item_registry[];   //Contains all Item types
 
-    //Loc: minicraft_world.cpp
+//minicraft_input.cpp
+extern bool g_k_keys[];   //Keyboard press booleans
+extern bool g_m_keys[];   //Mouse button press booleans
+extern int g_k_actions[]; //GLFW keyboard actions
+extern int g_m_actions[]; //GLFW mouse button actions
+extern Coord2d g_m_pos;   //Mouse position
 
-extern Chunk* ChunkBuffer[];    //Contains chunks currently in render distance
-extern Block* BlockRegistry[];  //Contains all Block types
-extern Item*  ItemRegistry[];   //Contains all Item types
+//minicraft_entity.cpp
+extern Entity* g_entity_registry[]; //All active entities
 
-    //Loc: minicraft_input.cpp
+//minicraft_main.cpp
+extern std::string g_game_path; //Global reference to argv[0]
 
-extern bool k_keys[];   //Keyboard press booleans
-extern bool m_keys[];   //Mouse button press booleans
-
-extern int k_actions[]; //GLFW keyboard actions
-extern int m_actions[]; //GLFW mouse button actions
-
-extern double m_posx;   //Mouse position in pixels
-extern double m_posy;   //------------------------
-
-    //Loc: minicraft_entity.cpp
-
-extern Entity* EntityRegistry[]; //All active entities
-
-    //Loc: minicraft_main.cpp
-
-extern std::string game_root_path;
-
-/*--- Functions (prefix = file location)---*/
+/*--- Functions ---*/
 
 Texture*    texture_generate(Image* img, uchar texture_load_options);   //Generate Texture Object
 Image*      texture_load_bmp(const char* path);                         //Load a 24-bit BMP
 void        texture_bind(Texture* t, GLuint sampler);                   //Bind texture to GL_TEXTURE_2D
 
-void    world_unload_chunk(std::string savename, Chunk* chunk);                             //Safely save and delete Chunk
-Chunk*  world_load_chunk(std::string savename, int x, int y, int seed);                     //Load or generate Chunk
-void    world_populate_chunk_buffer(std::string savename, Camera* cam);                     //Populate Chunk Buffer
-void    world_modify_chunk(std::string savename, int cx, int cy, int tx, int ty, int value);//Set tile of chunk to value
+void    world_unload_chunk(const std::string& savename, Chunk* chunk);                                  //Safely save and delete Chunk
+Chunk*  world_load_chunk(const std::string& savename, Coord2i ccoord, int seed);                        //Load or generate Chunk
+void    world_populate_chunk_buffer(const std::string& savename, Camera* cam);                          //Populate Chunk Buffer
+void    world_modify_chunk(const std::string& savename, Coord2i ccoord, Coord2i tcoord, uint value);    //Set tile of chunk to value
 Block*  world_construct_block(uint atlas_index, uchar options, Material mat,
-                              uint drop_id, uint drop_count);                               //Build new Chunk Struct
-Chunk*  world_chunkfile_read(std::string savename, uint cx, uint cy);                       //read chunk from file
-void    world_chunkfile_write(std::string savename, Chunk* chunk);                          //write chunk to chunkfile
+                              uint drop_id, uint drop_count);                                           //Build new Chunk Struct
+Chunk*  world_chunkfile_read(const std::string& savename, Coord2i ccoord);                              //read chunk from file
+void    world_chunkfile_write(const std::string& savename, Chunk* chunk);                               //write chunk to chunkfile
 
-GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale);                        //Init OpenGL, GLFW, and create window
-void        rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera);             //Draw a chunk
-void        rendering_draw_chunk_buffer(Texture* atlas_texture, Camera* camera);                    //Draw the chunk buffer
-Coord2d     rendering_viewport_to_world_pos(GLFWwindow* window, Camera* cam, double x, double y);   //Get world position of viewport position
+GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale);                //Init OpenGL, GLFW, and create window
+void        rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera);     //Draw a chunk
+void        rendering_draw_chunk_buffer(Texture* atlas_texture, Camera* camera);            //Draw the chunk buffer
+Coord2d     rendering_viewport_to_world_pos(GLFWwindow* window, Camera* cam, Coord2d pos);  //Get world position of viewport position
 
 void input_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);   //Keyboard callback
 void input_mouse_button_callback(GLFWwindow* window, int button, int actions, int mods);    //Mouse button callback
-void input_moues_position_callback(GLFWwindow* window, double xpos, double ypos);           //Mouse position callback
+void input_mouse_position_callback(GLFWwindow* window, double xpos, double ypos);           //Mouse position callback
 void input_register_callbacks(GLFWwindow* window);                                          //Register all callbacks with GLFW
 
 bool input_get_key(int keycode);        //Get key status
 bool input_get_button(int keycode);     //Get button status
 bool input_get_key_down(int keycode);   //Get new keystroke
 bool input_get_mouse_down(int keycode); //Get new mouse stroke
-void input_poll_input();    //Input poll
+void input_poll_input();                //Input poll
 
 void time_update_time(double glfw_time);    //Update time
 int  time_get_framerate();                  //Get FPS
