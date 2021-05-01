@@ -5,7 +5,7 @@
 
 #include "minicraft.h"
 
-VideoMode g_video_mode;
+Video_Mode g_video_mode;
 
 GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale){
 
@@ -37,8 +37,8 @@ GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale){
 
 void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera){
 
-    double chunk_x = chunk -> pos_x * (16 * 16) - (camera -> position.x - (g_video_mode.viewport.x / 2));
-    double chunk_y = chunk -> pos_y * (16 * 16) - (camera -> position.y - (g_video_mode.viewport.y / 2));
+    double chunk_x = chunk -> pos.x * (16 * 16) - (camera -> position.x - (g_video_mode.viewport.x / 2));
+    double chunk_y = chunk -> pos.y * (16 * 16) - (camera -> position.y - (g_video_mode.viewport.y / 2));
 
     for(int y = 0; y < 16; y++){
         for(int x = 0; x < 16; x++){
@@ -51,16 +51,16 @@ void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera){
             uint texture_coord_x = g_block_registry[chunk -> foreground_tiles[(y * 16) + x]] -> atlas_index % (atlas_texture -> width / TEXTURE_TILE_RES);
             uint texture_coord_y = g_block_registry[chunk -> foreground_tiles[(y * 16) + x]] -> atlas_index / (atlas_texture -> width / TEXTURE_TILE_RES);
 
-            double texture_uv_x = atlas_texture -> atlas_uv_dx * texture_coord_x;
-            double texture_uv_y = atlas_texture -> atlas_uv_dy * texture_coord_y;
+            double texture_uv_x = atlas_texture -> atlas_uvs.x * texture_coord_x;
+            double texture_uv_y = atlas_texture -> atlas_uvs.y * texture_coord_y;
 
             texture_bind(atlas_texture, 0);
             glEnable(GL_TEXTURE_2D);
             glBegin(GL_QUADS);{
                 glTexCoord2d(texture_uv_x,                                  texture_uv_y);                                  glVertex2d(chunk_x + (x * 16),        chunk_y + (y * 16));
-                glTexCoord2d(texture_uv_x + atlas_texture -> atlas_uv_dx,   texture_uv_y);                                  glVertex2d(chunk_x + (x * 16) + 16,   chunk_y + (y * 16));
-                glTexCoord2d(texture_uv_x + atlas_texture -> atlas_uv_dx,   texture_uv_y + atlas_texture -> atlas_uv_dy);   glVertex2d(chunk_x + (x * 16) + 16,   chunk_y + (y * 16) + 16);
-                glTexCoord2d(texture_uv_x,                                  texture_uv_y + atlas_texture -> atlas_uv_dy);   glVertex2d(chunk_x + (x * 16),        chunk_y + (y * 16) + 16);
+                glTexCoord2d(texture_uv_x + atlas_texture -> atlas_uvs.x,   texture_uv_y);                                  glVertex2d(chunk_x + (x * 16) + 16,   chunk_y + (y * 16));
+                glTexCoord2d(texture_uv_x + atlas_texture -> atlas_uvs.x,   texture_uv_y + atlas_texture -> atlas_uvs.y);   glVertex2d(chunk_x + (x * 16) + 16,   chunk_y + (y * 16) + 16);
+                glTexCoord2d(texture_uv_x,                                  texture_uv_y + atlas_texture -> atlas_uvs.y);   glVertex2d(chunk_x + (x * 16),        chunk_y + (y * 16) + 16);
             }
             glEnd();
             glDisable(GL_TEXTURE_2D);

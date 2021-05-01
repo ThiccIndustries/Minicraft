@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){
         world_populate_chunk_buffer(saveName,   active_camera);
         rendering_draw_chunk_buffer(tex,        active_camera);
         rendering_draw_entity((Entity*)player,  active_camera);
-        std::cout << time_get_framerate() << std::endl;
+
         entity_tick();
         glEnd();
         if(input_get_button(GLFW_MOUSE_BUTTON_1)){

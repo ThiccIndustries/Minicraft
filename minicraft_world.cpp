@@ -36,7 +36,7 @@ void world_populate_chunk_buffer(const std::string& savename, Camera* cam){
             int chunk_y = player_chunk_y - (y - RENDER_DISTANCE);
             int chunki = x + (y * RENDER_DISTANCE * 2);
 
-            if(g_chunk_buffer[chunki] != nullptr && g_chunk_buffer[chunki]->pos_x == chunk_x && g_chunk_buffer[chunki]->pos_y == chunk_y)
+            if(g_chunk_buffer[chunki] != nullptr && g_chunk_buffer[chunki]->pos.x == chunk_x && g_chunk_buffer[chunki]->pos.y == chunk_y)
                 continue;
 
             //Unload chunk already in buffer slot
@@ -55,16 +55,11 @@ Chunk* world_load_chunk(const std::string& savename, Coord2i coord, int seed){
     if(chunkptr != nullptr) return chunkptr;
 
     chunkptr = new Chunk;
+
     //Chunkfile does not exist
-    double perlin_coord_y1, perlin_coord_x, perlin_coord_y;
 
     for(int tx = 0; tx < 16; tx++){
         for(int ty = 0; ty < 16; ty++){
-            perlin_coord_x = ((coord.x * 256) + tx) * WORLD_PERLIN_SCALE;
-
-            perlin_coord_y = ((coord.x * 256) + ty) * WORLD_PERLIN_SCALE;
-            perlin_coord_y1 = ((coord.x * 256) + (ty - 1)) * WORLD_PERLIN_SCALE;
-
             chunkptr -> foreground_tiles[(ty * 16) + tx] = (coord.x + coord.y) % 2 == 0 ? 0 : 2;
 
             if(coord.x < 0)
@@ -73,8 +68,7 @@ Chunk* world_load_chunk(const std::string& savename, Coord2i coord, int seed){
         }
     }
 
-    chunkptr -> pos_x = coord.x;
-    chunkptr -> pos_y = coord.y;
+    chunkptr -> pos = coord;
 
     world_chunkfile_write(savename, chunkptr);
 
@@ -91,7 +85,7 @@ void world_modify_chunk(const std::string& savename, Coord2i ccoord, Coord2i tco
     //Look for chunk in chunk buffer
     Chunk* chunkptr;
     for(Chunk* c : g_chunk_buffer){
-        if(c -> pos_x == ccoord.x && c -> pos_y == ccoord.y){
+        if(c -> pos.x == ccoord.x && c -> pos.y == ccoord.y){
             chunkptr = c;
             break;
         }
@@ -120,10 +114,6 @@ Block* world_construct_block(uint id, uchar options, Material mat, uint drop_id,
 }
 
 Chunk* world_chunkfile_read(const std::string& savename, Coord2i coord){
-    int pos_x, pos_y;
-    uint overlay_tiles[256];
-    uint tiles[256];
-
     FILE* chunkfile = fopen(get_resource_path(g_game_path, "saves/" + savename + "/chunks/c" + std::to_string(coord.x) + "x" + std::to_string(coord.y) + ".cf").c_str(), "rb");
 
     //Chunk is new (no chunkfile)
@@ -133,8 +123,8 @@ Chunk* world_chunkfile_read(const std::string& savename, Coord2i coord){
 
     Chunk* chunkptr = new Chunk;
 
-    fread(&chunkptr -> pos_x, 1, sizeof(int), chunkfile);
-    fread(&chunkptr -> pos_y, 1, sizeof(int), chunkfile);
+    fread(&chunkptr -> pos.x, 1, sizeof(int), chunkfile);
+    fread(&chunkptr -> pos.y, 1, sizeof(int), chunkfile);
 
     fseek(chunkfile, 0x10, SEEK_SET);
 
@@ -147,8 +137,8 @@ Chunk* world_chunkfile_read(const std::string& savename, Coord2i coord){
 }
 
 void world_chunkfile_write(const std::string& savename, Chunk* chunk){
-    int cx = chunk -> pos_x;
-    int cy = chunk -> pos_y;
+    int cx = chunk -> pos.x;
+    int cy = chunk -> pos.y;
 
     std::filesystem::create_directories(get_resource_path(g_game_path, "saves/" + savename + "/chunks"));
     FILE* chunkfile = fopen(get_resource_path(g_game_path, "saves/" + savename + "/chunks/c" + std::to_string(cx) + "x" + std::to_string(cy) + ".cf").c_str(), "wb");

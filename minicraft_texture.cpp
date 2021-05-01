@@ -18,12 +18,12 @@ Texture* texture_generate(Image* img, uchar texture_load_options){
 
     //Calculate & Set atlas uvs
     if(texture_load_options & TEXTURE_MULTIPLE){
-        textureptr -> atlas_uv_dx = 1.0 / (textureptr -> width / TEXTURE_TILE_RES);
-        textureptr -> atlas_uv_dy = 1.0 / (textureptr -> height / TEXTURE_TILE_RES);
+        textureptr -> atlas_uvs.x = 1.0 / (textureptr -> width / TEXTURE_TILE_RES);
+        textureptr -> atlas_uvs.y = 1.0 / (textureptr -> height / TEXTURE_TILE_RES);
     }
 
     if(texture_load_options & TEXTURE_SINGLE){
-        textureptr -> atlas_uv_dx = textureptr -> atlas_uv_dy = 1.0;
+        textureptr -> atlas_uvs.x = textureptr -> atlas_uvs.y = 1.0;
     }
 
 

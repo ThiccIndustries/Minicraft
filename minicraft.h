@@ -62,10 +62,10 @@ typedef struct Coord2i{
     int x, y;
 }Coord2i;
 
-typedef struct VideoMode{
+typedef struct Video_Mode{
     Coord2i viewport;
     int scale;
-}VideoMode;
+}Video_Mode;
 
 //TODO: This seems pointless, is it gonna have anything added?
 //Camera struct for player entity
@@ -78,8 +78,7 @@ typedef struct Texture{
     GLuint id;          //OpenGL texture id
     uint width;         //Size of texture in pixels
     uint height;        //------------------------
-    double atlas_uv_dx; //Difference in UV coordinates per texture
-    double atlas_uv_dy; //---------------------------------------
+    Coord2d atlas_uvs;  //Difference in UV coordinates per texture
 } Texture;
 
 //Raw image data loaded from a BMP image
@@ -117,13 +116,11 @@ typedef struct Entity_Player{
     //TODO: Replace this with a universal storage system probably
     uchar item_v[PLAYER_INVENTORY_SIZE]{};              //Item slot ids
     uchar item_c[PLAYER_INVENTORY_SIZE]{};              //Item slot counts
-
 }Entity_Player;
 
 //World chunk
 typedef struct Chunk{
-    int pos_x ;                     //Chunk coordinates
-    int pos_y;                      //-----------------
+    Coord2i pos;                    //Chunk coordinates
     uchar overlay_tiles[256]{};     //Base tiles
     uchar foreground_tiles[256]{};  //Overlay tiles
 }Chunk;
@@ -159,7 +156,7 @@ extern uint     g_entity_highest_id; //The highest entity ID active in g_entity_
 extern std::string g_game_path; //Global reference to argv[0]
 
 //minicraft_rendering.cpp
-extern VideoMode g_video_mode;
+extern Video_Mode g_video_mode;
 
 /*--- Functions ---*/
 
