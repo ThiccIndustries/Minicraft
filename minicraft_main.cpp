@@ -16,14 +16,20 @@ int main(int argc, char* argv[]){
 
     //Load textures
     //TODO: Unify this. (Why would you ever need an Image and NOT a Texture)
-    Image* img = texture_load_bmp(get_resource_path(g_game_path, "terrain.bmp").c_str());
-    Texture* tex = texture_generate(img, TEXTURE_MULTIPLE);
+    Image* terr_img = texture_load_bmp(get_resource_path(g_game_path, "resources/terrain.bmp").c_str());
+    Image* font_img = texture_load_bmp(get_resource_path(g_game_path, "resources/font.bmp").c_str());
+
+    Texture* terr = texture_generate(terr_img, TEXTURE_MULTIPLE, 16);
+    Font* font = texture_construct_font(
+            texture_generate(font_img, TEXTURE_MULTIPLE, 8),
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&\'()*+,-./:;<=>?@[\\]^_ {|}~0123456789");
+
 
     Entity_Player* player = (Entity_Player*) entity_create((Entity*)new Entity_Player); //Entity 0
     Camera* active_camera = &player -> camera;  //Poiter to active rendering camera
 
     //Disable Vsync
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 
     input_register_callbacks(windowptr);
 
@@ -34,9 +40,9 @@ int main(int argc, char* argv[]){
         time_update_time(glfwGetTime());
 
         world_populate_chunk_buffer(saveName,   active_camera);
-        rendering_draw_chunk_buffer(tex,        active_camera);
+        rendering_draw_chunk_buffer(terr,       active_camera);
         rendering_draw_entity((Entity*)player,  active_camera);
-
+        rendering_draw_text("The Quick Brown Fox Jumped Over The Lazy Dog", 1, font, {10, 10});
         entity_tick();
         glEnd();
         if(input_get_button(GLFW_MOUSE_BUTTON_1)){
@@ -59,8 +65,8 @@ int main(int argc, char* argv[]){
             index++;
         }
 
-        player -> e.position.x += ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0)) * g_time -> delta * (5.612 * 16);
-        player -> e.position.y += ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0)) * g_time -> delta * (5.612 * 16);
+        player -> e.position.x += ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0)) * g_time -> delta * (4.317 * 16);
+        player -> e.position.y += ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0)) * g_time -> delta * (4.317 * 16);
 
         glfwSwapBuffers(windowptr);
     }

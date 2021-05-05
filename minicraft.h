@@ -21,7 +21,6 @@
 #define WORLD_PERLIN_SCALE 0.05
 #define WORLD_WATER_SCALE 0.25
 
-#define TEXTURE_TILE_RES 16
 #define TEXTURE_MULTIPLE 0x01
 #define TEXTURE_SINGLE   0x02
 
@@ -78,8 +77,14 @@ typedef struct Texture{
     GLuint id;          //OpenGL texture id
     uint width;         //Size of texture in pixels
     uint height;        //------------------------
+    uint tile_size;     //Size of tiles
     Coord2d atlas_uvs;  //Difference in UV coordinates per texture
 } Texture;
+
+typedef struct Font{
+    Texture* t;
+    std::string font_atlas;
+} Font;
 
 //Raw image data loaded from a BMP image
 typedef struct Image{
@@ -160,9 +165,10 @@ extern Video_Mode g_video_mode;
 
 /*--- Functions ---*/
 
-Texture*    texture_generate(Image* img, uchar texture_load_options);   //Generate Texture Object
-Image*      texture_load_bmp(const char* path);                         //Load a 24-bit BMP
-void        texture_bind(Texture* t, GLuint sampler);                   //Bind texture to GL_TEXTURE_2D
+Texture*    texture_generate(Image* img, uchar texture_load_options, uint tile_size);   //Generate Texture Object
+Font*       texture_construct_font(Texture* texture, const std::string& font_atlas);    //Create a font
+Image*      texture_load_bmp(const char* path);                                         //Load a 24-bit BMP
+void        texture_bind(Texture* t, GLuint sampler);                                   //Bind texture to GL_TEXTURE_2D
 
 void    world_unload_chunk(const std::string& savename, Chunk* chunk);                                  //Safely save and delete Chunk
 Chunk*  world_load_chunk(const std::string& savename, Coord2i ccoord, int seed);                        //Load or generate Chunk
@@ -177,6 +183,7 @@ GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale);    
 void        rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera);     //Draw a chunk
 void        rendering_draw_entity(Entity* entity, Camera* camera);                          //Draw an entity
 void        rendering_draw_chunk_buffer(Texture* atlas_texture, Camera* camera);            //Draw the chunk buffer
+void        rendering_draw_text(const std::string& text, uint size, Font* font, Coord2i pos);
 Coord2d     rendering_viewport_to_world_pos(Camera* cam, Coord2d pos);                      //Get world position of viewport position
 
 void input_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);   //Keyboard callback

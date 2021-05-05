@@ -5,7 +5,7 @@
 
 #include "minicraft.h"
 
-Texture* texture_generate(Image* img, uchar texture_load_options){
+Texture* texture_generate(Image* img, uchar texture_load_options, uint tile_size){
     Texture *textureptr = new Texture;
 
     //Create an OpenGL texture
@@ -15,11 +15,11 @@ Texture* texture_generate(Image* img, uchar texture_load_options){
 
     textureptr -> width     = img -> width;
     textureptr -> height    = img -> height;
-
+    textureptr -> tile_size = tile_size;
     //Calculate & Set atlas uvs
     if(texture_load_options & TEXTURE_MULTIPLE){
-        textureptr -> atlas_uvs.x = 1.0 / (textureptr -> width / TEXTURE_TILE_RES);
-        textureptr -> atlas_uvs.y = 1.0 / (textureptr -> height / TEXTURE_TILE_RES);
+        textureptr -> atlas_uvs.x = 1.0 / (textureptr -> width / tile_size);
+        textureptr -> atlas_uvs.y = 1.0 / (textureptr -> height / tile_size);
     }
 
     if(texture_load_options & TEXTURE_SINGLE){
@@ -37,6 +37,15 @@ Texture* texture_generate(Image* img, uchar texture_load_options){
     glBindTexture(GL_TEXTURE_2D, 0);
     
     return textureptr;
+}
+
+Font* texture_construct_font(Texture* texture, const std::string& font_atlas){
+    Font* fontptr = new Font;
+
+    fontptr -> t = texture;
+    fontptr -> font_atlas = font_atlas;
+
+    return fontptr;
 }
 
 Image* texture_load_bmp(const char* path){
