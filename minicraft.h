@@ -10,7 +10,6 @@
 #include "GLFW/glfw3.h"
 #include "iostream"
 
-
 /*--- Settings, bitflags, and selectors ---*/
 
 #define RENDER_SCALE 4
@@ -60,6 +59,10 @@ typedef struct Coord2d{
 typedef struct Coord2i{
     int x, y;
 }Coord2i;
+
+typedef struct Color{
+    uchar r, g, b;
+}Color;
 
 typedef struct Video_Mode{
     Coord2i viewport;
@@ -114,13 +117,16 @@ typedef struct Entity{
     EntityType type;    //Type enum of Entity. Def. ENT_GENERIC
 }Entity;
 
+typedef struct Storage{
+    uchar item_v[PLAYER_INVENTORY_SIZE]{};
+    uchar item_c[PLAYER_INVENTORY_SIZE]{};
+} Storage;
+
 //Player entity
 typedef struct Entity_Player{
-    Entity e{e.type = ENT_PLAYER};                      //Entity inheritance
-    Camera camera{{0, 0}};                              //Player camera
-    //TODO: Replace this with a universal storage system probably
-    uchar item_v[PLAYER_INVENTORY_SIZE]{};              //Item slot ids
-    uchar item_c[PLAYER_INVENTORY_SIZE]{};              //Item slot counts
+    Entity  e{e.type = ENT_PLAYER};     //Entity inheritance
+    Camera  camera{{0, 0}};   //Player camera
+    Storage inventory;
 }Entity_Player;
 
 //World chunk
@@ -183,7 +189,7 @@ GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale);    
 void        rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera);     //Draw a chunk
 void        rendering_draw_entity(Entity* entity, Camera* camera);                          //Draw an entity
 void        rendering_draw_chunk_buffer(Texture* atlas_texture, Camera* camera);            //Draw the chunk buffer
-void        rendering_draw_text(const std::string& text, uint size, Font* font, Coord2i pos);
+void        rendering_draw_text(const std::string& text, uint size, Font* font, Color color, Coord2i pos);
 Coord2d     rendering_viewport_to_world_pos(Camera* cam, Coord2d pos);                      //Get world position of viewport position
 
 void input_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);   //Keyboard callback
@@ -204,7 +210,7 @@ Entity* entity_create(Entity* entity);      //Add entity to entity_registry and 
 void    entity_delete(uint id);             //Removes entity to entity_registry and deletes Entity
 void    entity_tick();                      //Ticks all entities
 
-int player_inventory_add_item(Entity_Player* player, uint item_id, uint item_count);
+int storage_add_item(Storage* storage, uint item_id, uint item_count);
 
 
 /*---inline util functions---*/

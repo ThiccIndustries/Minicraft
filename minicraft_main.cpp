@@ -29,7 +29,7 @@ int main(int argc, char* argv[]){
     Camera* active_camera = &player -> camera;  //Poiter to active rendering camera
 
     //Disable Vsync
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     input_register_callbacks(windowptr);
 
@@ -42,9 +42,8 @@ int main(int argc, char* argv[]){
         world_populate_chunk_buffer(saveName,   active_camera);
         rendering_draw_chunk_buffer(terr,       active_camera);
         rendering_draw_entity((Entity*)player,  active_camera);
-        rendering_draw_text("The Quick Brown Fox Jumped Over The Lazy Dog", 1, font, {10, 10});
         entity_tick();
-        glEnd();
+
         if(input_get_button(GLFW_MOUSE_BUTTON_1)){
             Coord2d worldspace_pos = rendering_viewport_to_world_pos(active_camera, g_m_pos);
 
