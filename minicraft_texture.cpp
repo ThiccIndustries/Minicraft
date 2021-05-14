@@ -49,9 +49,9 @@ Font* texture_construct_font(Texture* texture, const std::string& font_atlas){
 }
 
 Image* texture_load_bmp(const char* path){
-    uchar header[54];       //BMP header
+    uchar header[54];       //BMP headere
     uchar dataPos;          //RGB Data offset
-    uchar width, height;    //Width and height of image
+    uint width, height;     //Width and height of image
     uint colorType;         //BMP color format
 
     //Open file
@@ -72,6 +72,9 @@ Image* texture_load_bmp(const char* path){
     width       = *(int*) &header[0x12];
     height      = *(int*) &header[0x16];
     colorType   = *(int*) &header[0x1C];
+
+    std::cout << (int)*(uchar*) &header[0x13] << std::endl;
+    std::cout << (uint)width << " : " << (uint)height << std::endl;
 
     //BMP must be 255 colors palletized
     if(colorType != 24){

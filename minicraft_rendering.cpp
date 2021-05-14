@@ -7,6 +7,11 @@
 
 Video_Mode g_video_mode;
 
+//Some stuff I dont wanna deal with outside minicraft_rendering.cpp.
+//TODO: put these back in minicraft.h? their own header?
+void rendering_draw_healthbar(uint health, Texture* ui_texture, uint atlas_index);
+void rendering_draw_cursor(Texture* ui_texture, uint atlas_index);
+
 GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale){
 
     //Init GLFW
@@ -23,11 +28,13 @@ GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale){
     glewInit();
 
     //Set up ortho projection
-    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, window_x, window_y, 0, 1, -1);
     glMatrixMode(GL_PROJECTION); //TODO: why is this here twice.
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    //Mouse mode
+    glfwSetInputMode(windowptr, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     g_video_mode.viewport    = {(int)window_x, (int)window_y};
     g_video_mode.scale       = scale;
@@ -73,6 +80,7 @@ void rendering_draw_entity(Entity* entity, Camera* camera){
     double entity_x = entity -> position.x - (camera -> position.x - (g_video_mode.viewport.x / 2));
     double entity_y = entity -> position.y - (camera -> position.y - (g_video_mode.viewport.y / 2));
 
+    //TODO: sprites
     //texture_bind(atlas_texture, 0);
     //glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);{
@@ -131,6 +139,66 @@ void rendering_draw_text(const std::string& text, uint size, Font* font, Color c
     glColor3ub(255, 255, 255);
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
+}
+
+void rendering_draw_cursor(Texture* ui_texture, uint atlas_index){
+    double x, y;
+    double uv_x, uv_y;
+
+    x = g_m_pos.x / g_video_mode.scale;
+    y = g_m_pos.y / g_video_mode.scale;
+
+    uv_x = (atlas_index % (ui_texture -> width / ui_texture -> tile_size)) * ui_texture -> atlas_uvs.x;
+    uv_y = (atlas_index / (ui_texture -> height / ui_texture -> tile_size)) * ui_texture -> atlas_uvs.y;
+
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    texture_bind(ui_texture, 0);
+
+    glBegin(GL_QUADS);{
+        glTexCoord2d(uv_x                            , uv_y                             ); glVertex2d(x                             , y);
+        glTexCoord2d(uv_x + ui_texture -> atlas_uvs.x, uv_y                             ); glVertex2d(x + ui_texture -> tile_size   , y);
+        glTexCoord2d(uv_x + ui_texture -> atlas_uvs.x, uv_y + ui_texture -> atlas_uvs.y ); glVertex2d(x + ui_texture -> tile_size   , y + ui_texture -> tile_size);
+        glTexCoord2d(uv_x                            , uv_y + ui_texture -> atlas_uvs.y ); glVertex2d(x                             , y + ui_texture -> tile_size);
+    }
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_BLEND);
+}
+
+void rendering_draw_healthbar(uint health, Texture* ui_texture, uint health_atlas1, uint health_atlas2){
+    double uv_x, uv_y;
+
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    texture_bind(ui_texture, 0);
+
+    uint atlas_index = health_atlas1;
+    for(uint i = 0; i < 10; ++i){
+
+        atlas_index = health >= (i + 1) ? health_atlas1 : health_atlas2;
+        uv_x = (atlas_index % (ui_texture -> width / ui_texture -> tile_size)) * ui_texture -> atlas_uvs.x;
+        uv_y = (atlas_index / (ui_texture -> height / ui_texture -> tile_size)) * ui_texture -> atlas_uvs.y;
+
+        glBegin(GL_QUADS);{
+            glTexCoord2d(uv_x                            , uv_y                             ); glVertex2d(2 + (i * ui_texture -> tile_size)                             , 2);
+            glTexCoord2d(uv_x + ui_texture -> atlas_uvs.x, uv_y                             ); glVertex2d(2 + (i * ui_texture -> tile_size) + ui_texture -> tile_size   , 2);
+            glTexCoord2d(uv_x + ui_texture -> atlas_uvs.x, uv_y + ui_texture -> atlas_uvs.y ); glVertex2d(2 + (i * ui_texture -> tile_size) + ui_texture -> tile_size   , 2 + ui_texture -> tile_size);
+            glTexCoord2d(uv_x                            , uv_y + ui_texture -> atlas_uvs.y ); glVertex2d(2 + (i * ui_texture -> tile_size)                             , 2 + ui_texture -> tile_size);
+        }
+        glEnd();
+    }
+
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_BLEND);
+}
+
+void rendering_draw_hud(Entity_Player* player, Texture* ui_texture_sheet){
+
+    //Draw cursor
+    rendering_draw_healthbar(player -> health, ui_texture_sheet, 1, 2);
+    rendering_draw_cursor(ui_texture_sheet, 0);
 }
 
 Coord2d rendering_viewport_to_world_pos(Camera* cam, Coord2d coord){

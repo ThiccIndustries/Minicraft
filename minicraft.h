@@ -125,13 +125,14 @@ typedef struct Storage{
 //Player entity
 typedef struct Entity_Player{
     Entity  e{e.type = ENT_PLAYER};     //Entity inheritance
-    Camera  camera{{0, 0}};   //Player camera
+    Camera  camera{{0, 0}};             //Player camera
     Storage inventory;
+    uint    health = 10;
 }Entity_Player;
 
 //World chunk
 typedef struct Chunk{
-    Coord2i pos;                    //Chunk coordinates
+    Coord2i pos{0,0};               //Chunk coordinates
     uchar overlay_tiles[256]{};     //Base tiles
     uchar foreground_tiles[256]{};  //Overlay tiles
 }Chunk;
@@ -142,7 +143,7 @@ typedef struct Time{
 } Time;
 
 
-/*--- Global objects and registries ---*/
+/*--- Global objects and registries. Globals are bad but so am I ---*/
 
 //minicraft_time.cpp
 extern Time* g_time; //Global time object
@@ -190,6 +191,7 @@ void        rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* c
 void        rendering_draw_entity(Entity* entity, Camera* camera);                          //Draw an entity
 void        rendering_draw_chunk_buffer(Texture* atlas_texture, Camera* camera);            //Draw the chunk buffer
 void        rendering_draw_text(const std::string& text, uint size, Font* font, Color color, Coord2i pos);
+void        rendering_draw_hud(Entity_Player* player, Texture* ui_texture_sheet);
 Coord2d     rendering_viewport_to_world_pos(Camera* cam, Coord2d pos);                      //Get world position of viewport position
 
 void input_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);   //Keyboard callback
