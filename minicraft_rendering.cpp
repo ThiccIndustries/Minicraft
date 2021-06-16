@@ -194,6 +194,9 @@ void rendering_draw_healthbar(uint health, Texture* ui_texture, uint health_atla
     glDisable(GL_BLEND);
 }
 
+void rendering_draw_dialog(std::string& title, std::string& message, Font* font){
+
+}
 void rendering_draw_hud(Entity_Player* player, Texture* ui_texture_sheet){
 
     //Draw cursor

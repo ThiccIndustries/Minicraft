@@ -69,7 +69,7 @@ typedef struct Video_Mode{
     int scale;
 }Video_Mode;
 
-//TODO: This seems pointless, is it gonna have anything added?
+//TODO: This is pointless
 //Camera struct for player entity
 typedef struct Camera{
     Coord2d position;
@@ -110,17 +110,24 @@ typedef struct Item{
     uint atlas_index;
 }Item;
 
-//All Entity types must contain an Entity member 'e' as their first member
-typedef struct Entity{
-    uint id;            //id of the entity in g_entity_registry
-    Coord2d position;   //position of the Entity
-    EntityType type;    //Type enum of Entity. Def. ENT_GENERIC
-}Entity;
-
 typedef struct Storage{
     uchar item_v[PLAYER_INVENTORY_SIZE]{};
     uchar item_c[PLAYER_INVENTORY_SIZE]{};
 } Storage;
+
+//Simple AABB
+typedef struct BoundingBox{
+    Coord2d p1; //Upper Left coordinate
+    Coord2d p2; //Upper Right coordinate
+} BoundingBox;
+
+//All Entity types must contain an Entity member 'e' as their first member
+typedef struct Entity{
+    uint id;            //id of the entity in g_entity_registry
+    Coord2d position;   //position of the Entity
+    BoundingBox bounds; //Bounding Box for entity
+    EntityType type;    //Type enum of Entity. Def. ENT_GENERIC
+}Entity;
 
 //Player entity
 typedef struct Entity_Player{
@@ -172,17 +179,15 @@ extern Video_Mode g_video_mode;
 
 /*--- Functions ---*/
 
-Texture*    texture_generate(Image* img, uchar texture_load_options, uint tile_size);   //Generate Texture Object
-Font*       texture_construct_font(Texture* texture, const std::string& font_atlas);    //Create a font
-Image*      texture_load_bmp(const char* path);                                         //Load a 24-bit BMP
-void        texture_bind(Texture* t, GLuint sampler);                                   //Bind texture to GL_TEXTURE_2D
+Texture*    texture_generate(Image* img, uchar texture_load_options, uint tile_size);           //Generate Texture Object
+Texture*    texture_load_bmp(const std::string&, uchar texture_load_options, uint tile_size);   //Load a 24-bit BMP
+void        texture_bind(Texture* t, GLuint sampler);                                           //Bind texture to GL_TEXTURE_2D
 
 void    world_unload_chunk(const std::string& savename, Chunk* chunk);                                  //Safely save and delete Chunk
 Chunk*  world_load_chunk(const std::string& savename, Coord2i ccoord, int seed);                        //Load or generate Chunk
 void    world_populate_chunk_buffer(const std::string& savename, Camera* cam);                          //Populate Chunk Buffer
+Chunk*  world_get_chunk(Coord2i ccoord);                                                                //Find a chunk in g_chunk_buffer
 void    world_modify_chunk(const std::string& savename, Coord2i ccoord, Coord2i tcoord, uint value);    //Set tile of chunk to value
-Block*  world_construct_block(uint atlas_index, uchar options, Material mat,
-                              uint drop_id, uint drop_count);                                           //Build new Chunk Struct
 Chunk*  world_chunkfile_read(const std::string& savename, Coord2i ccoord);                              //read chunk from file
 void    world_chunkfile_write(const std::string& savename, Chunk* chunk);                               //write chunk to chunkfile
 
@@ -208,9 +213,10 @@ void input_poll_input();                //Input poll
 void time_update_time(double glfw_time);    //Update time
 int  time_get_framerate();                  //Get FPS
 
-Entity* entity_create(Entity* entity);      //Add entity to entity_registry and assign id. Returns pointer address for convenience
-void    entity_delete(uint id);             //Removes entity to entity_registry and deletes Entity
-void    entity_tick();                      //Ticks all entities
+Entity* entity_create(Entity* entity);                                          //Add entity to entity_registry and assign id. Returns pointer address for convenience
+void    entity_move(Entity* entity, Coord2d delta, bool respect_collisions);    //Move an entity
+void    entity_delete(uint id);                                                 //Removes entity to entity_registry and deletes Entity
+void    entity_tick();                                                          //Ticks all entities
 
 int storage_add_item(Storage* storage, uint item_id, uint item_count);
 

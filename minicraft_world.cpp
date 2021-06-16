@@ -9,14 +9,22 @@
 Chunk* g_chunk_buffer[RENDER_DISTANCE * RENDER_DISTANCE * 4];
 
 Block* g_block_registry[255] = {
-        world_construct_block(0, 0, MAT_EARTH, 0, 0),   //Grass
-        world_construct_block(2, 0, MAT_STONE, 0, 0),   //Stone
-        world_construct_block(8, 0, MAT_EARTH, 0, 0),   //Sand
+        /*        Block Definitions----------------------------------
+                  Texture   Options     Material    DropID  DropCount */
+        new Block{0,        0,          MAT_EARTH,  0,      0},           //Grass
+        new Block{1,        0,          MAT_STONE,  0,      0},           //Stone
+        new Block{2,        TILE_SOLID, MAT_SOLID,  0,      0},   //Water
 
-        world_construct_block(4, TILE_SOLID, MAT_SOLID, 0, 0),   //Water
-        world_construct_block(5, TILE_SOLID, MAT_SOLID, 0, 0),   //Water Grass
-        world_construct_block(6, TILE_SOLID, MAT_SOLID, 0, 0),  //Water Stone
-        world_construct_block(7, TILE_SOLID, MAT_SOLID, 0, 0),   //Water Sand
+        new Block{8 ,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_TL
+        new Block{9 ,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_TC
+        new Block{10,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_TR
+
+        new Block{16,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_MR
+        new Block{18,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_ML
+
+        new Block{24,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_BL
+        new Block{25,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_BC
+        new Block{26,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_BR
 };
 
 Item* g_item_registry[255] = {
@@ -56,17 +64,22 @@ Chunk* world_load_chunk(const std::string& savename, Coord2i coord, int seed){
 
     chunkptr = new Chunk;
 
-    //Chunkfile does not exist
+    //Generate chunk
 
     for(int tx = 0; tx < 16; tx++){
         for(int ty = 0; ty < 16; ty++){
-            chunkptr -> foreground_tiles[(ty * 16) + tx] = (coord.x + coord.y) % 2 == 0 ? 0 : 2;
-
-            if(coord.x < 0)
-                chunkptr -> foreground_tiles[(ty * 16) + tx] = (coord.x + coord.y) % 2 == 0 ? 1 : 3;
-
+            chunkptr -> foreground_tiles[(ty * 16) + tx] = 0;
         }
     }
+
+    //Seed = x^3 + y
+    std::srand((coord.x * coord.x * coord.x) + coord.y);
+
+    int x1 = ((double)rand() / RAND_MAX) * 16;
+    int y1 = ((double)rand() / RAND_MAX) * 16;
+
+
+    chunkptr -> foreground_tiles[(y1 * 16) + x1] = 1;
 
     chunkptr -> pos = coord;
 
@@ -83,13 +96,7 @@ void world_unload_chunk(const std::string& savename, Chunk* chunk){
 
 void world_modify_chunk(const std::string& savename, Coord2i ccoord, Coord2i tcoord, uint value){
     //Look for chunk in chunk buffer
-    Chunk* chunkptr;
-    for(Chunk* c : g_chunk_buffer){
-        if(c -> pos.x == ccoord.x && c -> pos.y == ccoord.y){
-            chunkptr = c;
-            break;
-        }
-    }
+    Chunk* chunkptr = world_get_chunk(ccoord);
 
     //Chunk isn't loaded
     if(chunkptr == nullptr){
@@ -101,16 +108,15 @@ void world_modify_chunk(const std::string& savename, Coord2i ccoord, Coord2i tco
     world_chunkfile_write(savename, chunkptr);
 }
 
-Block* world_construct_block(uint id, uchar options, Material mat, uint drop_id, uint drop_count){
-    Block* blockptr = new Block;
 
-    blockptr -> atlas_index = id;
-    blockptr -> options     = options;
-    blockptr -> material    = mat;
-    blockptr -> drop_id     = drop_id;
-    blockptr -> drop_count  = drop_count;
-
-    return blockptr;
+Chunk* world_get_chunk(Coord2i ccoord){
+    for(Chunk* c : g_chunk_buffer){
+        if(c -> pos.x == ccoord.x && c -> pos.y == ccoord.y){
+            return c;
+            break;
+        }
+    }
+    return nullptr;
 }
 
 Chunk* world_chunkfile_read(const std::string& savename, Coord2i coord){

@@ -48,14 +48,14 @@ Font* texture_construct_font(Texture* texture, const std::string& font_atlas){
     return fontptr;
 }
 
-Image* texture_load_bmp(const char* path){
-    uchar header[54];       //BMP headere
+Texture* texture_load_bmp(const std::string& path, uchar texture_load_options, uint tile_size){
+    uchar header[54];       //BMP header
     uchar dataPos;          //RGB Data offset
     uint width, height;     //Width and height of image
     uint colorType;         //BMP color format
 
     //Open file
-    FILE* file = fopen(path, "rb");
+    FILE* file = fopen(path.c_str(), "rb");
     if(!file){
         std::cout << "test0" << std::endl;  //TODO: Handle this
         return nullptr;
@@ -118,7 +118,7 @@ Image* texture_load_bmp(const char* path){
     imageptr -> height      = height;
     imageptr -> imageData   = rgba_array;
 
-    return imageptr;
+    return texture_generate(imageptr, texture_load_options, tile_size);
 }
 
 void texture_bind(Texture* t, GLuint sampler){
