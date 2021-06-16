@@ -34,7 +34,8 @@
 #define PLAYER_INVENTORY_SIZE       256
 #define PLAYER_INVENTORY_STACK_SIZE 64
 
-
+#define TIME_MAX_TIMERS 0x0F
+#define TIME_TIMER_ORPHAN_THRESHOLD 300 //Time after which a timer should be considered an orphan
 /*--- Enums and structs ---*/
 
 enum Material{
@@ -69,6 +70,7 @@ typedef struct Color{
 typedef struct Video_Mode{
     Coord2i viewport;
     int scale;
+    GLFWwindow* windowptr;
 }Video_Mode;
 
 //TODO: This is pointless
@@ -151,23 +153,18 @@ typedef struct Time{
     double global;  //Absolute time since game was started
 } Time;
 
+//Timer reference ID
+typedef uint Timer;
 
 /*--- Global objects and registries. Globals are bad but so am I ---*/
 
 //minicraft_time.cpp
-extern Time* g_time; //Global time object
+extern Time* g_time;        //Global time object
 
 //minicraft_world.cpp
 extern Chunk* g_chunk_buffer[];    //Contains loaded chunks
 extern Block* g_block_registry[];  //Contains all Block types
 extern Item*  g_item_registry[];   //Contains all Item types
-
-//minicraft_input.cpp
-extern bool g_k_keys[];   //Keyboard press booleans
-extern bool g_m_keys[];   //Mouse button press booleans
-extern int g_k_actions[]; //GLFW keyboard actions
-extern int g_m_actions[]; //GLFW mouse button actions
-extern Coord2d g_m_pos;   //Mouse position
 
 //minicraft_entity.cpp
 extern Entity*  g_entity_registry[]; //All active entities
@@ -178,6 +175,8 @@ extern std::string g_game_path; //Global reference to argv[0]
 
 //minicraft_rendering.cpp
 extern Video_Mode g_video_mode;
+extern Font* g_def_font;
+
 
 /*--- Functions ---*/
 
@@ -199,6 +198,7 @@ void        rendering_draw_entity(Entity* entity, Camera* camera);              
 void        rendering_draw_chunk_buffer(Texture* atlas_texture, Camera* camera);            //Draw the chunk buffer
 void        rendering_draw_text(const std::string& text, uint size, Font* font, Color color, Coord2i pos);
 void        rendering_draw_hud(Entity_Player* player, Texture* ui_texture_sheet);
+void        rendering_draw_dialog(const std::string& title, const std::string& message, Font* font);
 Coord2d     rendering_viewport_to_world_pos(Camera* cam, Coord2d pos);                      //Get world position of viewport position
 
 void input_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);   //Keyboard callback
@@ -209,11 +209,17 @@ void input_register_callbacks(GLFWwindow* window);                              
 bool input_get_key(int keycode);        //Get key status
 bool input_get_button(int keycode);     //Get button status
 bool input_get_key_down(int keycode);   //Get new keystroke
+bool input_get_key_up(int keycode);
 bool input_get_mouse_down(int keycode); //Get new mouse stroke
+bool input_get_mouse_up(int keycode);   //Get mouse button release
+Coord2d input_mouse_position();
 void input_poll_input();                //Input poll
 
 void time_update_time(double glfw_time);    //Update time
 int  time_get_framerate();                  //Get FPS
+uint time_timer_start(double duration);     //Start a timer and return a timer id
+bool time_timer_finished(uint timer_id);    //check if timer is finished, if finished, deletes the timer
+void time_timer_cancel(uint timer_id);      //end and delete the timer
 
 Entity* entity_create(Entity* entity);                                          //Add entity to entity_registry and assign id. Returns pointer address for convenience
 void    entity_move(Entity* entity, Coord2d delta, bool respect_collisions);    //Move an entity
@@ -224,6 +230,21 @@ int storage_add_item(Storage* storage, uint item_id, uint item_count);
 
 
 /*---inline util functions---*/
+
+inline void error(const std::string& error_message){
+    time_timer_cancel(0); //Insure available timer for close
+    Timer t = time_timer_start(10);
+
+    while(!time_timer_finished(t)){
+        rendering_draw_dialog("ENGINE ERROR:", error_message, g_def_font);
+        glfwSwapBuffers(g_video_mode.windowptr);
+        glfwPollEvents();
+        time_update_time(glfwGetTime());
+    }
+
+    glfwSetWindowShouldClose(g_video_mode.windowptr, 1);
+
+}
 
 inline int clampi(int a, int min, int max){
     if(a > max) return max;

@@ -6,6 +6,7 @@
 #include "minicraft.h"
 
 Video_Mode g_video_mode;
+Font* g_def_font;
 
 //Some stuff I dont wanna deal with outside minicraft_rendering.cpp.
 //TODO: put these back in minicraft.h? their own header?
@@ -38,7 +39,7 @@ GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale){
 
     g_video_mode.viewport    = {(int)window_x, (int)window_y};
     g_video_mode.scale       = scale;
-
+    g_video_mode.windowptr   = windowptr;
     return windowptr;
 }
 
@@ -150,8 +151,8 @@ void rendering_draw_cursor(Texture* ui_texture, uint atlas_index){
     double x, y;
     double uv_x, uv_y;
 
-    x = g_m_pos.x / g_video_mode.scale;
-    y = g_m_pos.y / g_video_mode.scale;
+    x = input_mouse_position().x / g_video_mode.scale;
+    y = input_mouse_position().y / g_video_mode.scale;
 
     uv_x = (atlas_index % (ui_texture -> width / ui_texture -> tile_size)) * ui_texture -> atlas_uvs.x;
     uv_y = (atlas_index / (ui_texture -> height / ui_texture -> tile_size)) * ui_texture -> atlas_uvs.y;
@@ -199,8 +200,33 @@ void rendering_draw_healthbar(uint health, Texture* ui_texture, uint health_atla
     glDisable(GL_BLEND);
 }
 
-void rendering_draw_dialog(std::string& title, std::string& message, Font* font){
+void rendering_draw_dialog(const std::string& title, const std::string& message, Font* font){
+    //How many pixels to offset message by to center it
+    uint offset = ((RENDER_WINX / 2) - (message.length() * font -> t -> tile_size) / 2);
+    uint title_offset = ((RENDER_WINX / 2) - (title.length() * font -> t -> tile_size) / 2);
 
+    glColor3ub(255, 255, 255);
+    glBegin(GL_QUADS);{
+        glVertex2i(offset - 2                                                   , (RENDER_WINY / 2) - 2 - (int)(font -> t -> tile_size / 2) - (3 * font -> t -> tile_size));
+        glVertex2i(offset + 2 + ((message.length()) * font -> t -> tile_size)   , (RENDER_WINY / 2) - 2 - (int)(font -> t -> tile_size / 2) - (3 * font -> t -> tile_size));
+        glVertex2i(offset + 2 + ((message.length()) * font -> t -> tile_size)   , (RENDER_WINY / 2) + 2 - (int)(font -> t -> tile_size / 2) + 2 * font -> t -> tile_size);
+        glVertex2i(offset - 2                                                   , (RENDER_WINY / 2) + 2 - (int)(font -> t -> tile_size / 2) + 2 * font -> t -> tile_size);
+    }
+    glEnd();
+    glColor3ub(255, 255, 255);
+
+    glColor3ub(0, 0, 0);
+    glBegin(GL_QUADS);{
+        glVertex2i(offset                                                      , (RENDER_WINY / 2) - (int)(font -> t -> tile_size / 2) - (3 * font -> t -> tile_size));
+        glVertex2i(offset + ((message.length()) * font -> t -> tile_size)      , (RENDER_WINY / 2) - (int)(font -> t -> tile_size / 2) - (3 * font -> t -> tile_size));
+        glVertex2i(offset + ((message.length()) * font -> t -> tile_size)      , (RENDER_WINY / 2) - (int)(font -> t -> tile_size / 2) + 2 * font -> t -> tile_size);
+        glVertex2i(offset                                                      , (RENDER_WINY / 2) - (int)(font -> t -> tile_size / 2) + 2 * font -> t -> tile_size);
+    }
+    glEnd();
+    glColor3ub(255, 255, 255);
+
+    rendering_draw_text(title, 1, font, {255, 255, 255}, {(int)title_offset, (RENDER_WINY / 2) - (int)(font -> t -> tile_size / 2) - (2* (int)font -> t -> tile_size)});
+    rendering_draw_text(message, 1, font, {255, 255, 255}, {(int)offset, (RENDER_WINY / 2) - (int)(font -> t -> tile_size / 2)});
 }
 void rendering_draw_hud(Entity_Player* player, Texture* ui_texture_sheet){
 

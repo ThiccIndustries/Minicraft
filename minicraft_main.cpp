@@ -16,15 +16,20 @@ int main(int argc, char* argv[]){
 
     //Load textures
     //TODO: Unify this. (Why would you ever need an Image and NOT a Texture)
-    Texture* terr = texture_load_bmp(get_resource_path(g_game_path, "resources/terrain.bmp"), TEXTURE_MULTIPLE, 16);
-    Texture* ui   = texture_load_bmp(get_resource_path(g_game_path, "resources/ui.bmp"), TEXTURE_MULTIPLE, 8);
     Font* font = new Font{
-            texture_load_bmp(get_resource_path(g_game_path, "resources/font.bmp").c_str(), TEXTURE_MULTIPLE, 16),
+            texture_load_bmp(get_resource_path(g_game_path, "resources/font.bmp").c_str(), TEXTURE_MULTIPLE, 8),
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&\'()*+,-./:;<=>?@[\\]^_ {|}~0123456789"
     };
+    g_def_font = font;
+
+    Texture* terr = texture_load_bmp(get_resource_path(g_game_path, "resources/terrain.bmp"), TEXTURE_MULTIPLE, 16);
+    Texture* ui   = texture_load_bmp(get_resource_path(g_game_path, "resources/ui.bmp"), TEXTURE_MULTIPLE, 8);
+
 
     Entity_Player* player = (Entity_Player*) entity_create((Entity*)new Entity_Player); //Entity 0
     Camera* active_camera = &player -> camera;  //Poiter to active rendering camera
+
+
 
     player -> e.bounds = {{1,1}, {15, 15}};
     //Disable Vsync
@@ -35,6 +40,7 @@ int main(int argc, char* argv[]){
     uint index = 0;
     double timer = 0;
 
+    uint place_timer;
 
     while(!glfwWindowShouldClose(windowptr)){
         input_poll_input();
@@ -44,10 +50,19 @@ int main(int argc, char* argv[]){
         rendering_draw_chunk_buffer(terr,       active_camera);
         rendering_draw_entity((Entity*)player,  active_camera);
         rendering_draw_hud(player, ui);
+        //rendering_draw_dialog("Test", font);
         entity_tick();
 
-        if(input_get_button(GLFW_MOUSE_BUTTON_1)){
-            Coord2d worldspace_pos = rendering_viewport_to_world_pos(active_camera, g_m_pos);
+        if(input_get_mouse_down(GLFW_MOUSE_BUTTON_1)) {
+            timer = time_timer_start(1);
+        }
+
+        /*if(input_get_mouse_up(GLFW_MOUSE_BUTTON_1)) {
+            time_timer_cancel(place_timer);
+        }*/
+
+        /*if(time_timer_finished(place_timer)){
+            Coord2d worldspace_pos = rendering_viewport_to_world_pos(active_camera, input_mouse_position());
 
             Coord2i chunk{ (int)floor(worldspace_pos.x / 256.0),
                            (int)floor(worldspace_pos.y / 256.0) };
@@ -56,17 +71,15 @@ int main(int argc, char* argv[]){
                           (int)(worldspace_pos.y - (chunk.y * 256)) / 16 };
 
             world_modify_chunk(saveName, chunk, tile, index);
-        }
+        }*/
 
         if(input_get_key_down(GLFW_KEY_Q)){
-
             index = clampi(index - 1, 0, 19);
         }
 
         if(input_get_key_down(GLFW_KEY_E)){
             index = clampi(index + 1, 0, 19);
         }
-
 
         double dx = ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0)) * g_time -> delta * (4.317 * 16);
         double dy = ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0)) * g_time -> delta * (4.317 * 16);
