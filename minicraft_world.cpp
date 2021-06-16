@@ -9,22 +9,33 @@
 Chunk* g_chunk_buffer[RENDER_DISTANCE * RENDER_DISTANCE * 4];
 
 Block* g_block_registry[255] = {
-        /*        Block Definitions----------------------------------
-                  Texture   Options     Material    DropID  DropCount */
-        new Block{0,        0,          MAT_EARTH,  0,      0},           //Grass
-        new Block{1,        0,          MAT_STONE,  0,      0},           //Stone
-        new Block{2,        TILE_SOLID, MAT_SOLID,  0,      0},   //Water
+        /*        Block Definitions------------------------------------------------------
+                  Texture   Options                         Material    DropID  DropCount */
+        new Block{0,        0,                              MAT_EARTH,  0,      0}, //Grass
+        new Block{1,        0,                              MAT_STONE,  0,      0}, //Stone
+        new Block{2,        TILE_SOLID,                     MAT_SOLID,  0,      0}, //Water
 
-        new Block{8 ,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_TL
-        new Block{9 ,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_TC
-        new Block{10,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_TR
+        new Block{3 ,       TILE_SOLID,                     MAT_SOLID,  0,      0}, //water_grass_TL
+        new Block{4 ,       TILE_SOLID,                     MAT_SOLID,  0,      0}, //water_grass_TC
+        new Block{3 ,       TILE_SOLID | TILE_TEX_FLIP_X,   MAT_SOLID,  0,      0}, //water_grass_TR
 
-        new Block{16,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_MR
-        new Block{18,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_ML
+        new Block{5,        TILE_SOLID,                     MAT_SOLID,  0,      0},  //water_grass_MR
+        new Block{5,        TILE_SOLID | TILE_TEX_FLIP_X,   MAT_SOLID,  0,      0},  //water_grass_ML
 
-        new Block{24,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_BL
-        new Block{25,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_BC
-        new Block{26,       TILE_SOLID, MAT_SOLID,  0,      0},   //water_grass_BR
+        new Block{6,        TILE_SOLID,                     MAT_SOLID,  0,      0},  //water_grass_BL
+        new Block{7,        TILE_SOLID,                     MAT_SOLID,  0,      0},  //water_grass_BC
+        new Block{6,        TILE_SOLID | TILE_TEX_FLIP_X,   MAT_SOLID,  0,      0},  //water_grass_BR
+
+        new Block{11 ,      TILE_SOLID,                     MAT_SOLID,  0,      0}, //water_stone_TL
+        new Block{12 ,      TILE_SOLID,                     MAT_SOLID,  0,      0}, //water_stone_TC
+        new Block{11 ,      TILE_SOLID | TILE_TEX_FLIP_X,   MAT_SOLID,  0,      0}, //water_stone_TR
+
+        new Block{13,       TILE_SOLID,                     MAT_SOLID,  0,      0},  //water_stone_MR
+        new Block{13,       TILE_SOLID | TILE_TEX_FLIP_X,   MAT_SOLID,  0,      0},  //water_stone_ML
+
+        new Block{14,       TILE_SOLID,                     MAT_SOLID,  0,      0},  //water_stone_BL
+        new Block{15,       TILE_SOLID,                     MAT_SOLID,  0,      0},  //water_stone_BC
+        new Block{14,       TILE_SOLID | TILE_TEX_FLIP_X,   MAT_SOLID,  0,      0},  //water_stone_BR
 };
 
 Item* g_item_registry[255] = {

@@ -16,15 +16,12 @@ int main(int argc, char* argv[]){
 
     //Load textures
     //TODO: Unify this. (Why would you ever need an Image and NOT a Texture)
-    Texture* terr[]   = {   texture_load_bmp(get_resource_path(g_game_path, "resources/terrain_0.bmp"), TEXTURE_MULTIPLE, 16),
-                            texture_load_bmp(get_resource_path(g_game_path, "resources/terrain_1.bmp"), TEXTURE_MULTIPLE, 16),
-                            texture_load_bmp(get_resource_path(g_game_path, "resources/terrain_2.bmp"), TEXTURE_MULTIPLE, 16)   };
-
-    Texture* ui     = texture_load_bmp(get_resource_path(g_game_path, "resources/ui.bmp"), TEXTURE_MULTIPLE, 8);
-    /*Font* font = new Font{
+    Texture* terr = texture_load_bmp(get_resource_path(g_game_path, "resources/terrain.bmp"), TEXTURE_MULTIPLE, 16);
+    Texture* ui   = texture_load_bmp(get_resource_path(g_game_path, "resources/ui.bmp"), TEXTURE_MULTIPLE, 8);
+    Font* font = new Font{
             texture_load_bmp(get_resource_path(g_game_path, "resources/font.bmp").c_str(), TEXTURE_MULTIPLE, 16),
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&\'()*+,-./:;<=>?@[\\]^_ {|}~0123456789"
-    };*/
+    };
 
     Entity_Player* player = (Entity_Player*) entity_create((Entity*)new Entity_Player); //Entity 0
     Camera* active_camera = &player -> camera;  //Poiter to active rendering camera
@@ -36,7 +33,6 @@ int main(int argc, char* argv[]){
     input_register_callbacks(windowptr);
 
     uint index = 0;
-    uint animIndex = 0;
     double timer = 0;
 
 
@@ -45,7 +41,7 @@ int main(int argc, char* argv[]){
         time_update_time(glfwGetTime());
 
         world_populate_chunk_buffer(saveName,   active_camera);
-        rendering_draw_chunk_buffer(terr[animIndex],       active_camera);
+        rendering_draw_chunk_buffer(terr,       active_camera);
         rendering_draw_entity((Entity*)player,  active_camera);
         rendering_draw_hud(player, ui);
         entity_tick();
@@ -64,26 +60,17 @@ int main(int argc, char* argv[]){
 
         if(input_get_key_down(GLFW_KEY_Q)){
 
-            index = clampi(index - 1, 0, 10);
+            index = clampi(index - 1, 0, 19);
         }
 
         if(input_get_key_down(GLFW_KEY_E)){
-            index = clampi(index + 1, 0, 10);
+            index = clampi(index + 1, 0, 19);
         }
 
 
         double dx = ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0)) * g_time -> delta * (4.317 * 16);
         double dy = ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0)) * g_time -> delta * (4.317 * 16);
         entity_move((Entity*)player, {dx, dy}, true);
-
-        if(timer >= 0.25){
-            animIndex += 1;
-            if(animIndex > 2)
-                animIndex = 0;
-            timer = 0;
-        }
-
-        timer += g_time -> delta;
 
         glfwSwapBuffers(windowptr);
     }

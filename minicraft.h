@@ -23,9 +23,11 @@
 #define TEXTURE_MULTIPLE 0x01
 #define TEXTURE_SINGLE   0x02
 
-#define TILE_BREAKABLE   0x01
-#define TILE_TRANSPARENT 0x02
-#define TILE_SOLID       0x03
+#define TILE_BREAKABLE   0x01   //Tile is destructible
+#define TILE_TRANSPARENT 0x02   //Tile has transparency
+#define TILE_SOLID       0x04   //Tile has collisions
+#define TILE_TEX_FLIP_X  0x08   //Tile should be rendered with texture flipped across X axis
+#define TILE_TEX_FLIP_Y  0x10   //Tile should be rendered with texture flipped across Y axis
 
 #define ENTITY_MAX 0xFF
 
