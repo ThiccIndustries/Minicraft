@@ -57,13 +57,13 @@ Texture* texture_load_bmp(const std::string& path, uchar texture_load_options, u
     //Open file
     FILE* file = fopen(path.c_str(), "rb");
     if(!file){
-        error("Texture file not found.");
+        error("Texture not found.");
         return nullptr;
     }
 
     //Read 54 bytes -> header
     if(fread(header, 1, 54, file) != 54) {
-        error("Invalid texture header.");
+        error("Texture header corrupt.");
         return nullptr;
     };
 
@@ -78,7 +78,7 @@ Texture* texture_load_bmp(const std::string& path, uchar texture_load_options, u
 
     //BMP must be 255 colors palletized
     if(colorType != 24){
-        error("Invalid texture color mode.");
+        error("Incompatible texture.");
         return nullptr;
     }
 

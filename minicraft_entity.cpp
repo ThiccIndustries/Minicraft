@@ -58,21 +58,22 @@ void entity_move(Entity* entity, Coord2d delta, bool respect_collisions){
                       (int)(entity->position.y  / 16) };
 
         Chunk* chunkptr;
+        Coord2i rel_tile;
 
-        //Loop though tileswd
+        //Loop though tiles
         for(int x = tile.x - 2; x < tile.x + 2; x++){
             for(int y = tile.y - 2; y < tile.y + 2; y++){
 
                 chunk = { (int)floor((double)x / 16.0),
                           (int)floor((double)y / 16.0) };
 
-                Coord2i rel_tile{ (int)((double)x - (chunk.x * 16)),
-                                  (int)((double)y - (chunk.y * 16))};
+                rel_tile = { (int)((double)x - (chunk.x * 16)),
+                             (int)((double)y - (chunk.y * 16)) };
 
                 chunkptr = world_get_chunk(chunk);
 
                 //Tile is not solid, no need to check AABB
-                if(!(g_block_registry[chunkptr->foreground_tiles[rel_tile.x + (rel_tile.y * 16)]]->options & TILE_SOLID))
+                if(!(g_block_registry[ chunkptr->foreground_tiles[ rel_tile.x + (rel_tile.y * 16) ] ]->options & TILE_SOLID))
                     continue;
 
                 //TODO: is this even right?
@@ -98,7 +99,9 @@ void entity_tick(){
             case ENT_GENERIC:
                 break;
             case ENT_PLAYER:
-                ((Entity_Player*)g_entity_registry[i]) -> camera.position = g_entity_registry[i] -> position;
+                if( ((Entity_Player*)g_entity_registry[i]) -> health == 0){
+                    error("You were slain.");
+                }
                 break;
         }
     }

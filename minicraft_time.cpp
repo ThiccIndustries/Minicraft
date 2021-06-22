@@ -5,80 +5,68 @@
 
 #include "minicraft.h"
 
-typedef struct ITimer{
-    double duration;
-    double start_stamp;
-} ITimer;
-
 Time* g_time = new Time;
-ITimer* timers[TIME_MAX_TIMERS];
+
+
+void (* tick_callback)();
+double time_since_tick = 0;
 
 int time_timer_purge();
 
 void time_update_time(double glfw_time){
     g_time -> delta = glfw_time - g_time -> global;
     g_time -> global = glfw_time;
+
+    if(time_since_tick >= 1.0 / TIME_TPS) {
+        g_time->tick++;
+        tick_callback();
+
+        time_since_tick = 0;
+    }
+    else
+        time_since_tick += g_time -> delta;
 }
 
 int time_get_framerate(){
    return (int)(1.0 / g_time -> delta);
 }
 
-Timer time_timer_start(double duration){
+Timer* time_timer_start(long duration){
 
-    for(int i = 0; i < TIME_MAX_TIMERS; ++i){
-        if(timers[i] == nullptr){
-            timers[i] = new ITimer{duration, g_time -> global};
+    Timer* t = new Timer;
 
-            std::cout << "Timer #" << i << " started." << std::endl;
-            return i;
-        }
-    }
+    t -> duration = duration;
+    t -> starting_tick = g_time -> tick;
 
-    //no available timer, attempt to purge orphans and try again
-    if(time_timer_purge() > 0)
-        return time_timer_start(duration);
 
-    //No orphans were removed, cannot start timer
-    std::cout << "here" << std::endl;
-    error("No avail timers. No orphans.");
-    return -1;
+    return t;
 }
 
-bool time_timer_finished(Timer t){
+bool time_timer_finished(Timer*& t){
 
-    if(timers[t] == nullptr)
+    if(t == nullptr)
         return false;
 
     //timer is finished
-    if(g_time -> global >= (timers[t] -> start_stamp + timers[t] -> duration)){
+    if(g_time -> tick >= (t -> starting_tick + t -> duration)){
         time_timer_cancel(t);
-        std::cout << "Timer #" << t << " finished." << std::endl;
         return true;
     }else
         return false;
 
 }
 
-//Purge any timer which has been been completed for over TIME_TIMER_ORPHAN_THRESHOLD seconds without having its status checked.
-//This is a last resort that can cause all sorts of problems if that timer is somehow still needed.
-
-int time_timer_purge(){
-    int count = 0;
-
-    for(uint i = 0; i < TIME_MAX_TIMERS; i++){
-        if(g_time -> global - (timers[i] -> start_stamp + timers[i] -> duration) >= TIME_TIMER_ORPHAN_THRESHOLD){
-            time_timer_cancel(i);
-            count++;
-        }
-    }
-
-    std::cout << "Purged: " << count << " orphaned timers." << std::endl;
-    return count;
+void time_set_tick_callback(void (*callback_function)()){
+    tick_callback = callback_function;
 }
 
-void time_timer_cancel(Timer t){
+
+void time_timer_cancel(Timer*& t){
+    if(t == nullptr)
+        return;
+
     std::cout << "Timer #" << t << " ended." << std::endl;
-    delete timers[t];
-    timers[t] = nullptr;
+    delete t;
+    t = nullptr;
+
 }

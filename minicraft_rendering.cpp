@@ -43,10 +43,10 @@ GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale){
     return windowptr;
 }
 
-void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera){
+void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Entity* viewpoint_e){
 
-    double chunk_x = chunk -> pos.x * (16 * 16) - (camera -> position.x - (g_video_mode.viewport.x / 2));
-    double chunk_y = chunk -> pos.y * (16 * 16) - (camera -> position.y - (g_video_mode.viewport.y / 2));
+    double chunk_x = chunk -> pos.x * (16 * 16) - (viewpoint_e -> position.x + (viewpoint_e -> camera.position.x) - (g_video_mode.viewport.x / 2));
+    double chunk_y = chunk -> pos.y * (16 * 16) - (viewpoint_e -> position.y + (viewpoint_e -> camera.position.y) - (g_video_mode.viewport.y / 2));
 
     for(int y = 0; y < 16; y++){
         for(int x = 0; x < 16; x++){
@@ -82,9 +82,9 @@ void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera){
     }
 }
 
-void rendering_draw_entity(Entity* entity, Camera* camera){
-    double entity_x = entity -> position.x - (camera -> position.x - (g_video_mode.viewport.x / 2));
-    double entity_y = entity -> position.y - (camera -> position.y - (g_video_mode.viewport.y / 2));
+void rendering_draw_entity(Entity* entity, Entity* viewport_e){
+    double entity_x = entity -> position.x - (viewport_e -> position.x + (viewport_e -> camera.position.x) - (g_video_mode.viewport.x / 2));
+    double entity_y = entity -> position.y - (viewport_e -> position.y + (viewport_e -> camera.position.y) - (g_video_mode.viewport.y / 2));
 
     //TODO: sprites
     //texture_bind(atlas_texture, 0);
@@ -99,9 +99,9 @@ void rendering_draw_entity(Entity* entity, Camera* camera){
     //glDisable(GL_TEXTURE_2D);
 }
 
-void rendering_draw_chunk_buffer(Texture* atlas_texture, Camera* camera){
+void rendering_draw_chunk_buffer(Texture* atlas_texture, Entity* viewport_e){
     for(int i = 0; i < RENDER_DISTANCE * RENDER_DISTANCE * 4; ++i){
-        rendering_draw_chunk(g_chunk_buffer[i], atlas_texture, camera);
+        rendering_draw_chunk(g_chunk_buffer[i], atlas_texture, viewport_e);
     }
 }
 
@@ -235,11 +235,11 @@ void rendering_draw_hud(Entity_Player* player, Texture* ui_texture_sheet){
     rendering_draw_cursor(ui_texture_sheet, 0);
 }
 
-Coord2d rendering_viewport_to_world_pos(Camera* cam, Coord2d coord){
+Coord2d rendering_viewport_to_world_pos(Entity* viewport_e, Coord2d coord){
     Coord2d position;
 
-    position.x = (coord.x / g_video_mode.scale) + (cam -> position.x - (g_video_mode.viewport.x / 2));
-    position.y = (coord.y / g_video_mode.scale) + (cam -> position.y - (g_video_mode.viewport.y / 2));
+    position.x = (coord.x / g_video_mode.scale) + (viewport_e -> position.x + (viewport_e -> camera.position.x) - (g_video_mode.viewport.x / 2));
+    position.y = (coord.y / g_video_mode.scale) + (viewport_e -> position.y + (viewport_e -> camera.position.y) - (g_video_mode.viewport.y / 2));
 
     return position;
 }

@@ -7,6 +7,9 @@
 #include <cmath>
 
 std::string g_game_path;
+
+void tick();
+
 int main(int argc, char* argv[]){
 
     g_game_path = argv[0];
@@ -25,12 +28,7 @@ int main(int argc, char* argv[]){
     Texture* terr = texture_load_bmp(get_resource_path(g_game_path, "resources/terrain.bmp"), TEXTURE_MULTIPLE, 16);
     Texture* ui   = texture_load_bmp(get_resource_path(g_game_path, "resources/ui.bmp"), TEXTURE_MULTIPLE, 8);
 
-
-    Entity_Player* player = (Entity_Player*) entity_create((Entity*)new Entity_Player); //Entity 0
-    Camera* active_camera = &player -> camera;  //Poiter to active rendering camera
-
-
-
+    Entity_Player* player = (Entity_Player*) entity_create( ((Entity*)new Entity_Player)); //Entity 0
     player -> e.bounds = {{1,1}, {15, 15}};
     //Disable Vsync
     glfwSwapInterval(0);
@@ -38,31 +36,27 @@ int main(int argc, char* argv[]){
     input_register_callbacks(windowptr);
 
     uint index = 0;
-    double timer = 0;
 
-    uint place_timer;
+    Timer* timer = nullptr;
+
+    time_set_tick_callback(&tick);
 
     while(!glfwWindowShouldClose(windowptr)){
         input_poll_input();
         time_update_time(glfwGetTime());
 
-        world_populate_chunk_buffer(saveName,   active_camera);
-        rendering_draw_chunk_buffer(terr,       active_camera);
-        rendering_draw_entity((Entity*)player,  active_camera);
+        world_populate_chunk_buffer(saveName,   (Entity*)player);
+        rendering_draw_chunk_buffer(terr,       (Entity*)player);
+        rendering_draw_entity((Entity*)player,  (Entity*)player);
         rendering_draw_hud(player, ui);
         //rendering_draw_dialog("Test", font);
-        entity_tick();
 
-        if(input_get_mouse_down(GLFW_MOUSE_BUTTON_1)) {
-            timer = time_timer_start(1);
+        if(input_get_button_up(GLFW_MOUSE_BUTTON_1)) {
+            time_timer_cancel(timer);
         }
 
-        /*if(input_get_mouse_up(GLFW_MOUSE_BUTTON_1)) {
-            time_timer_cancel(place_timer);
-        }*/
-
-        /*if(time_timer_finished(place_timer)){
-            Coord2d worldspace_pos = rendering_viewport_to_world_pos(active_camera, input_mouse_position());
+        if(time_timer_finished(timer)){
+            Coord2d worldspace_pos = rendering_viewport_to_world_pos((Entity*)player, input_mouse_position());
 
             Coord2i chunk{ (int)floor(worldspace_pos.x / 256.0),
                            (int)floor(worldspace_pos.y / 256.0) };
@@ -71,14 +65,20 @@ int main(int argc, char* argv[]){
                           (int)(worldspace_pos.y - (chunk.y * 256)) / 16 };
 
             world_modify_chunk(saveName, chunk, tile, index);
-        }*/
+        }
+        if(input_get_button(GLFW_MOUSE_BUTTON_1)){
+            timer = time_timer_start(1);
+        }
+
 
         if(input_get_key_down(GLFW_KEY_Q)){
-            index = clampi(index - 1, 0, 19);
+            //index = clampi(index - 1, 0, 19);
+            player -> health --;
         }
 
         if(input_get_key_down(GLFW_KEY_E)){
-            index = clampi(index + 1, 0, 19);
+            //index = clampi(index + 1, 0, 19);
+            player -> health ++;
         }
 
         double dx = ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0)) * g_time -> delta * (4.317 * 16);
@@ -93,5 +93,9 @@ int main(int argc, char* argv[]){
     glfwTerminate();
 
     return 0;
+}
+
+void tick(){
+    entity_tick();
 }
 

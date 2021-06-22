@@ -43,10 +43,10 @@ Item* g_item_registry[255] = {
 
 };
 
-void world_populate_chunk_buffer(const std::string& savename, Camera* cam){
+void world_populate_chunk_buffer(const std::string& savename, Entity* viewport_e){
 
-    int player_chunk_x = (int)cam -> position.x / 256;
-    int player_chunk_y = (int)cam -> position.y / 256;
+    int player_chunk_x = (int)(viewport_e -> position.x + (viewport_e -> camera.position.x)) / 256;
+    int player_chunk_y = (int)(viewport_e -> position.y + (viewport_e -> camera.position.x)) / 256;
 
     for(int x = 0; x < RENDER_DISTANCE * 2; x++){
         for(int y = 0; y < RENDER_DISTANCE * 2; y++){

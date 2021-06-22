@@ -34,8 +34,8 @@
 #define PLAYER_INVENTORY_SIZE       256
 #define PLAYER_INVENTORY_STACK_SIZE 64
 
-#define TIME_MAX_TIMERS 0x0F
-#define TIME_TIMER_ORPHAN_THRESHOLD 300 //Time after which a timer should be considered an orphan
+#define TIME_TPS        20
+
 /*--- Enums and structs ---*/
 
 enum Material{
@@ -63,10 +63,12 @@ typedef struct Coord2i{
     int x, y;
 }Coord2i;
 
+//Color struct
 typedef struct Color{
     uchar r, g, b;
 }Color;
 
+//Video mode of the game window
 typedef struct Video_Mode{
     Coord2i viewport;
     int scale;
@@ -127,16 +129,16 @@ typedef struct BoundingBox{
 
 //All Entity types must contain an Entity member 'e' as their first member
 typedef struct Entity{
-    uint id;            //id of the entity in g_entity_registry
-    Coord2d position;   //position of the Entity
-    BoundingBox bounds; //Bounding Box for entity
-    EntityType type;    //Type enum of Entity. Def. ENT_GENERIC
+    uint id;                //id of the entity in g_entity_registry
+    Coord2d position;       //position of the Entity
+    BoundingBox bounds;     //Bounding Box for entity
+    Camera camera{{8,8}};   //TODO: Seems strange to give every ent. a camera, but i guess it could allow cool stuff like spectating? P.S. might be useful for multiplayer too.
+    EntityType type;        //Type enum of Entity. Def. ENT_GENERIC
 }Entity;
 
 //Player entity
 typedef struct Entity_Player{
-    Entity  e{e.type = ENT_PLAYER};     //Entity inheritance
-    Camera  camera{{0, 0}};             //Player camera
+    Entity  e{.type = ENT_PLAYER}; //Entity inheritance
     Storage inventory;
     uint    health = 10;
 }Entity_Player;
@@ -150,11 +152,15 @@ typedef struct Chunk{
 
 typedef struct Time{
     double delta;   //The time past between the previous and current frames
+    long   tick;    //The number of game ticks
     double global;  //Absolute time since game was started
 } Time;
 
 //Timer reference ID
-typedef uint Timer;
+typedef struct Timer{
+    long duration;
+    long starting_tick;
+} Timer;
 
 /*--- Global objects and registries. Globals are bad but so am I ---*/
 
@@ -180,60 +186,66 @@ extern Font* g_def_font;
 
 /*--- Functions ---*/
 
+//minicraft_texture.cpp
 Texture*    texture_generate(Image* img, uchar texture_load_options, uint tile_size);           //Generate Texture Object
 Texture*    texture_load_bmp(const std::string&, uchar texture_load_options, uint tile_size);   //Load a 24-bit BMP
 void        texture_bind(Texture* t, GLuint sampler);                                           //Bind texture to GL_TEXTURE_2D
 
+//minicraft_world.cpp
 void    world_unload_chunk(const std::string& savename, Chunk* chunk);                                  //Safely save and delete Chunk
 Chunk*  world_load_chunk(const std::string& savename, Coord2i ccoord, int seed);                        //Load or generate Chunk
-void    world_populate_chunk_buffer(const std::string& savename, Camera* cam);                          //Populate Chunk Buffer
+void    world_populate_chunk_buffer(const std::string& savename, Entity* viewport_e);                   //Populate Chunk Buffer
 Chunk*  world_get_chunk(Coord2i ccoord);                                                                //Find a chunk in g_chunk_buffer
 void    world_modify_chunk(const std::string& savename, Coord2i ccoord, Coord2i tcoord, uint value);    //Set tile of chunk to value
 Chunk*  world_chunkfile_read(const std::string& savename, Coord2i ccoord);                              //read chunk from file
 void    world_chunkfile_write(const std::string& savename, Chunk* chunk);                               //write chunk to chunkfile
 
-GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale);                //Init OpenGL, GLFW, and create window
-void        rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Camera* camera);     //Draw a chunk
-void        rendering_draw_entity(Entity* entity, Camera* camera);                          //Draw an entity
-void        rendering_draw_chunk_buffer(Texture* atlas_texture, Camera* camera);            //Draw the chunk buffer
-void        rendering_draw_text(const std::string& text, uint size, Font* font, Color color, Coord2i pos);
-void        rendering_draw_hud(Entity_Player* player, Texture* ui_texture_sheet);
-void        rendering_draw_dialog(const std::string& title, const std::string& message, Font* font);
-Coord2d     rendering_viewport_to_world_pos(Camera* cam, Coord2d pos);                      //Get world position of viewport position
+//minicraft_rendering.cpp
+GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale);                                //Init OpenGL, GLFW, and create window
+void        rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Entity* viewport_e);                 //Draw a chunk
+void        rendering_draw_entity(Entity* entity, Entity* viewport_e);                                      //Draw an entity
+void        rendering_draw_chunk_buffer(Texture* atlas_texture, Entity* viewport_e);                        //Draw the chunk buffer
+void        rendering_draw_text(const std::string& text, uint size, Font* font, Color color, Coord2i pos);  //Draw text
+void        rendering_draw_hud(Entity_Player* player, Texture* ui_texture_sheet);                           //Draw hud
+void        rendering_draw_dialog(const std::string& title, const std::string& message, Font* font);        //Draw a dialog
+Coord2d     rendering_viewport_to_world_pos(Entity* viewport_e, Coord2d pos);                               //Get world position of viewport position
 
+//minicraft_input.cpp
 void input_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);   //Keyboard callback
 void input_mouse_button_callback(GLFWwindow* window, int button, int actions, int mods);    //Mouse button callback
 void input_mouse_position_callback(GLFWwindow* window, double xpos, double ypos);           //Mouse position callback
 void input_register_callbacks(GLFWwindow* window);                                          //Register all callbacks with GLFW
+bool input_get_key(int keycode);            //Get key status
+bool input_get_key_down(int keycode);       //Get keyboard button down event
+bool input_get_key_up(int keycode);         //Get keyboard button up event
+bool input_get_button(int keycode);         //Get button status
+bool input_get_button_down(int keycode);    //Get new mouse stroke
+bool input_get_button_up(int keycode);      //Get mouse button release
+Coord2d input_mouse_position();             //Get mouse position
+void input_poll_input();                    //Input poll
 
-bool input_get_key(int keycode);        //Get key status
-bool input_get_button(int keycode);     //Get button status
-bool input_get_key_down(int keycode);   //Get new keystroke
-bool input_get_key_up(int keycode);
-bool input_get_mouse_down(int keycode); //Get new mouse stroke
-bool input_get_mouse_up(int keycode);   //Get mouse button release
-Coord2d input_mouse_position();
-void input_poll_input();                //Input poll
+//minicraft_input.cpp
+void time_update_time(double glfw_time);                    //Update time
+int  time_get_framerate();                                  //Get FPS
+void time_set_tick_callback(void (*callback_function)());   //Add a function pointer to list of functions called every tick
+Timer* time_timer_start(long duration);                     //Start a timer and return a timer id
+bool time_timer_finished(Timer*& t);                        //check if timer is finished, if finished, deletes the timer
+void time_timer_cancel(Timer*& t);                          //end and delete the timer
 
-void time_update_time(double glfw_time);    //Update time
-int  time_get_framerate();                  //Get FPS
-uint time_timer_start(double duration);     //Start a timer and return a timer id
-bool time_timer_finished(uint timer_id);    //check if timer is finished, if finished, deletes the timer
-void time_timer_cancel(uint timer_id);      //end and delete the timer
-
+//minicraft_entity.cpp
 Entity* entity_create(Entity* entity);                                          //Add entity to entity_registry and assign id. Returns pointer address for convenience
 void    entity_move(Entity* entity, Coord2d delta, bool respect_collisions);    //Move an entity
 void    entity_delete(uint id);                                                 //Removes entity to entity_registry and deletes Entity
 void    entity_tick();                                                          //Ticks all entities
 
+//minicraft_storage.cpp
 int storage_add_item(Storage* storage, uint item_id, uint item_count);
 
 
 /*---inline util functions---*/
 
 inline void error(const std::string& error_message){
-    time_timer_cancel(0); //Insure available timer for close
-    Timer t = time_timer_start(10);
+    Timer* t = time_timer_start(TIME_TPS * 10);
 
     while(!time_timer_finished(t)){
         rendering_draw_dialog("ENGINE ERROR:", error_message, g_def_font);
