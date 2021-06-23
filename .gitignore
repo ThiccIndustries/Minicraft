@@ -1,4 +1,3 @@
 cmake-build-debug/
-glad-master/
-GLFW/
+camek-build-release/
 .idea/

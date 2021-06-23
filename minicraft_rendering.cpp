@@ -31,7 +31,7 @@ GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale){
     //Set up ortho projection
     glLoadIdentity();
     glOrtho(0, window_x, window_y, 0, 1, -1);
-    glMatrixMode(GL_PROJECTION); //TODO: why is this here twice.
+    glMatrixMode(GL_PROJECTION);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     //Mouse mode
@@ -78,25 +78,130 @@ void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Entity* viewpoin
             glEnd();
             glDisable(GL_TEXTURE_2D);
 
+            #ifdef DEBUG
+                if(g_block_registry[chunk -> foreground_tiles[(y * 16) + x]] -> options & TILE_SOLID) {
+                    glColor3ub(255, 0, 0);
+                    glLineWidth(2);
+                    glBegin(GL_LINES);
+                    {
+                        glVertex2d(chunk_x + (x * 16),      chunk_y + (y * 16));
+                        glVertex2d(chunk_x + (x * 16) + 16, chunk_y + (y * 16));
+
+                        glVertex2d(chunk_x + (x * 16),      chunk_y + (y * 16) + 16);
+                        glVertex2d(chunk_x + (x * 16) + 16, chunk_y + (y * 16) + 16);
+
+                        glVertex2d(chunk_x + (x * 16), chunk_y + (y * 16));
+                        glVertex2d(chunk_x + (x * 16), chunk_y + (y * 16) + 16);
+
+                        glVertex2d(chunk_x + (x * 16) + 16, chunk_y + (y * 16));
+                        glVertex2d(chunk_x + (x * 16) + 16, chunk_y + (y * 16) + 16);
+                    }
+                    glEnd();
+                    glColor3ub(255, 255, 255);
+                }
+            #endif
+
+
         }
     }
 }
 
-void rendering_draw_entity(Entity* entity, Entity* viewport_e){
+void rendering_draw_entity(Entity* entity, Texture* atlas_texture, Entity* viewport_e){
     double entity_x = entity -> position.x - (viewport_e -> position.x + (viewport_e -> camera.position.x) - (g_video_mode.viewport.x / 2));
     double entity_y = entity -> position.y - (viewport_e -> position.y + (viewport_e -> camera.position.y) - (g_video_mode.viewport.y / 2));
 
+    //Get texture for current state
+    uint index = entity -> atlas_index;
+    bool inv_x = false;
+
+    switch(entity -> direction){
+        case DIRECTION_NORTH:
+            index += 1;
+            inv_x = false;
+            break;
+        case DIRECTION_EAST:
+            index += 2;
+            inv_x = true;
+            break;
+        case DIRECTION_SOUTH:
+            index += 0;
+            inv_x = false;
+            break;
+        case DIRECTION_WEST:
+            index += 2;
+            inv_x = false;
+            break;
+    }
+
+    switch(entity -> move_state){
+        case MOVE_ACTIVE:
+            int anim_tick = g_time -> tick % entity -> animation_rate;
+            int anim_rate_d = entity -> animation_rate / 4;
+            if(anim_tick >= anim_rate_d * 3)
+                index += 8;
+            else if(anim_tick >= anim_rate_d * 2)
+                index += 0;
+            else if(anim_tick >= anim_rate_d * 1)
+                index += 16;
+
+    }
+
+    //std::cout << inv_x << std::endl;
+    uint texture_coord_x = index % (atlas_texture -> width / atlas_texture -> tile_size);
+    uint texture_coord_y = index / (atlas_texture -> width / atlas_texture -> tile_size);
+
+    double texture_uv_x = atlas_texture -> atlas_uvs.x * texture_coord_x;
+    double texture_uv_y = atlas_texture -> atlas_uvs.y * texture_coord_y;
+
     //TODO: sprites
-    //texture_bind(atlas_texture, 0);
-    //glEnable(GL_TEXTURE_2D);
+    texture_bind(atlas_texture, 0);
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+
     glBegin(GL_QUADS);{
-        glVertex2d(entity_x,        entity_y);
-        glVertex2d(entity_x + 16,   entity_y);
-        glVertex2d(entity_x + 16,   entity_y + 16);
-        glVertex2d(entity_x,        entity_y + 16);
+        glTexCoord2d(texture_uv_x + (atlas_texture -> atlas_uvs.x * inv_x),     texture_uv_y);                                 glVertex2d(entity_x,        entity_y);
+        glTexCoord2d(texture_uv_x + (atlas_texture -> atlas_uvs.x * !inv_x),    texture_uv_y);                                 glVertex2d(entity_x + 16,   entity_y);
+        glTexCoord2d(texture_uv_x + (atlas_texture -> atlas_uvs.x * !inv_x),    texture_uv_y + atlas_texture -> atlas_uvs.y);  glVertex2d(entity_x + 16,   entity_y + 16);
+        glTexCoord2d(texture_uv_x + (atlas_texture -> atlas_uvs.x * inv_x),     texture_uv_y + atlas_texture -> atlas_uvs.y);  glVertex2d(entity_x,        entity_y + 16);
     }
     glEnd();
-    //glDisable(GL_TEXTURE_2D);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_BLEND);
+
+#ifdef DEBUG
+    Coord2d entity_bounds_p1{
+        entity_x + entity -> bounds.p1.x,
+        entity_y + entity -> bounds.p1.y
+    };
+    Coord2d entity_bounds_p2{
+            entity_x + entity -> bounds.p2.x,
+            entity_y + entity -> bounds.p2.y
+    };
+
+    glColor3ub(255, 0, 0);
+    glBegin(GL_LINES);{
+        glVertex2d(entity_bounds_p1.x, entity_bounds_p1.y);
+        glVertex2d(entity_bounds_p2.x, entity_bounds_p1.y);
+
+        glVertex2d(entity_bounds_p1.x, entity_bounds_p2.y);
+        glVertex2d(entity_bounds_p2.x, entity_bounds_p2.y);
+
+        glVertex2d(entity_bounds_p1.x, entity_bounds_p1.y);
+        glVertex2d(entity_bounds_p1.x, entity_bounds_p2.y);
+
+        glVertex2d(entity_bounds_p2.x, entity_bounds_p1.y);
+        glVertex2d(entity_bounds_p2.x, entity_bounds_p2.y);
+    }
+    glEnd();
+    glColor3ub(255, 255, 255);
+#endif
+
+}
+
+void rendering_draw_entities(Texture* atlas_texture, Entity* viewport_e){
+    for(int i = g_entity_highest_id; i >= 0; i--){
+        rendering_draw_entity(g_entity_registry[i], atlas_texture, viewport_e);
+    }
 }
 
 void rendering_draw_chunk_buffer(Texture* atlas_texture, Entity* viewport_e){

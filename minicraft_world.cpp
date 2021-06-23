@@ -12,8 +12,10 @@ Block* g_block_registry[255] = {
         /*        Block Definitions------------------------------------------------------
                   Texture   Options                         Material    DropID  DropCount */
         new Block{0,        0,                              MAT_EARTH,  0,      0}, //Grass
+        new Block{16,       0,                              MAT_EARTH,  0,      0}, //Grass_rose
         new Block{1,        0,                              MAT_STONE,  0,      0}, //Stone
-        new Block{2,        TILE_SOLID,                     MAT_SOLID,  0,      0}, //Water
+        new Block{2,        TILE_SOLID,                     MAT_SOLID,  0,      0}, //water
+        new Block{10,       TILE_SOLID,                     MAT_SOLID,  0,      0}, //water_lily
 
         new Block{3 ,       TILE_SOLID,                     MAT_SOLID,  0,      0}, //water_grass_TL
         new Block{4 ,       TILE_SOLID,                     MAT_SOLID,  0,      0}, //water_grass_TC
@@ -36,6 +38,10 @@ Block* g_block_registry[255] = {
         new Block{14,       TILE_SOLID,                     MAT_SOLID,  0,      0},  //water_stone_BL
         new Block{15,       TILE_SOLID,                     MAT_SOLID,  0,      0},  //water_stone_BC
         new Block{14,       TILE_SOLID | TILE_TEX_FLIP_X,   MAT_SOLID,  0,      0},  //water_stone_BR
+
+        new Block{8,        TILE_SOLID,                     MAT_WOOD,   0,      0}, //Resource_Wood
+        new Block{9,        TILE_SOLID,                     MAT_STONE,  0,      0}, //Resource_Stone
+
 };
 
 Item* g_item_registry[255] = {
@@ -84,14 +90,14 @@ Chunk* world_load_chunk(const std::string& savename, Coord2i coord, int seed){
     }
 
     //Seed = x^3 + y
-    std::srand((coord.x * coord.x * coord.x) + coord.y);
+    /*std::srand((coord.x * coord.x * coord.x) + coord.y);
 
     int x1 = ((double)rand() / RAND_MAX) * 16;
     int y1 = ((double)rand() / RAND_MAX) * 16;
 
 
     chunkptr -> foreground_tiles[(y1 * 16) + x1] = 1;
-
+    */
     chunkptr -> pos = coord;
 
     world_chunkfile_write(savename, chunkptr);
@@ -124,7 +130,6 @@ Chunk* world_get_chunk(Coord2i ccoord){
     for(Chunk* c : g_chunk_buffer){
         if(c -> pos.x == ccoord.x && c -> pos.y == ccoord.y){
             return c;
-            break;
         }
     }
     return nullptr;

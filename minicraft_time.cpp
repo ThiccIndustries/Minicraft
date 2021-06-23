@@ -65,7 +65,9 @@ void time_timer_cancel(Timer*& t){
     if(t == nullptr)
         return;
 
+#ifdef DEBUG
     std::cout << "Timer #" << t << " ended." << std::endl;
+#endif
     delete t;
     t = nullptr;
 

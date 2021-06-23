@@ -10,6 +10,12 @@
 #include "GLFW/glfw3.h"
 #include "iostream"
 
+
+//Remove strange double negative
+#ifndef NDEBUG
+    #define DEBUG
+#endif
+
 /*--- Settings, bitflags, and selectors ---*/
 
 #define RENDER_SCALE 4
@@ -29,12 +35,12 @@
 #define TILE_TEX_FLIP_X  0x08   //Tile should be rendered with texture flipped across X axis
 #define TILE_TEX_FLIP_Y  0x10   //Tile should be rendered with texture flipped across Y axis
 
-#define ENTITY_MAX 0xFF
+#define ENTITY_MAX 0xFFFF
 
 #define PLAYER_INVENTORY_SIZE       256
 #define PLAYER_INVENTORY_STACK_SIZE 64
 
-#define TIME_TPS        20
+#define TIME_TPS    59
 
 /*--- Enums and structs ---*/
 
@@ -42,12 +48,24 @@ enum Material{
     MAT_STONE,      //Requires pickaxe to break effectively
     MAT_WOOD,       //Requires axe to break effectively
     MAT_EARTH,      //Requires shovel to break effectively
-    MAT_SOLID       //NO BUFF
+    MAT_SOLID       //Cannot harvest
 };
 
 enum EntityType{
     ENT_GENERIC,
     ENT_PLAYER
+};
+
+enum MovementState{
+    MOVE_STATIONARY,
+    MOVE_ACTIVE,
+};
+
+enum MovementDirection{
+    DIRECTION_NORTH,
+    DIRECTION_EAST,
+    DIRECTION_SOUTH,
+    DIRECTION_WEST
 };
 
 typedef unsigned int  uint; //Shorthand unsigned int type
@@ -131,14 +149,23 @@ typedef struct BoundingBox{
 typedef struct Entity{
     uint id;                //id of the entity in g_entity_registry
     Coord2d position;       //position of the Entity
+    uint atlas_index;       //Index of the Upper-Left corner of sprites 3x3 sprite sheet //TODO: What?
     BoundingBox bounds;     //Bounding Box for entity
     Camera camera{{8,8}};   //TODO: Seems strange to give every ent. a camera, but i guess it could allow cool stuff like spectating? P.S. might be useful for multiplayer too.
+    uint move_state;        //Is entity moving
+    uint direction;         //Direction entity facing
+    uint animation_rate;    //Rate at which to animate movement speed
     EntityType type;        //Type enum of Entity. Def. ENT_GENERIC
 }Entity;
 
 //Player entity
 typedef struct Entity_Player{
-    Entity  e{.type = ENT_PLAYER}; //Entity inheritance
+    Entity  e{
+        .bounds = {{5,10}, {11, 15}},
+        .animation_rate = TIME_TPS,
+        .type = ENT_PLAYER
+    }; //Entity inheritance
+
     Storage inventory;
     uint    health = 10;
 }Entity_Player;
@@ -203,7 +230,8 @@ void    world_chunkfile_write(const std::string& savename, Chunk* chunk);       
 //minicraft_rendering.cpp
 GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale);                                //Init OpenGL, GLFW, and create window
 void        rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Entity* viewport_e);                 //Draw a chunk
-void        rendering_draw_entity(Entity* entity, Entity* viewport_e);                                      //Draw an entity
+void        rendering_draw_entity(Entity* entity, Texture* atlas_texture, Entity* viewport_e);              //Draw an entity
+void        rendering_draw_entities(Texture* atlas_texture, Entity* viewport_e);
 void        rendering_draw_chunk_buffer(Texture* atlas_texture, Entity* viewport_e);                        //Draw the chunk buffer
 void        rendering_draw_text(const std::string& text, uint size, Font* font, Color color, Coord2i pos);  //Draw text
 void        rendering_draw_hud(Entity_Player* player, Texture* ui_texture_sheet);                           //Draw hud
@@ -244,7 +272,10 @@ int storage_add_item(Storage* storage, uint item_id, uint item_count);
 
 /*---inline util functions---*/
 
-inline void error(const std::string& error_message){
+inline void error(const std::string& error_message, const std::string& console){
+#ifndef NDEBUG
+    std::cout << console << std::endl;
+#endif
     Timer* t = time_timer_start(TIME_TPS * 10);
 
     while(!time_timer_finished(t)){
