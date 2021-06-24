@@ -1,6 +1,7 @@
 /*
  * Created by MajesticWaffle on 4/27/21.
  * Copyright (c) 2021 Thicc Industries. All rights reserved.
+ * This software is under the: Thicc-Industries-Do-What-You-Want-I-Dont-Care License.
  */
 
 #ifndef MINICRAFT_MINICRAFT_H
