@@ -11,7 +11,6 @@ Entity* g_entity_registry[ENTITY_MAX];
 uint g_entity_highest_id = 0;
 
 Entity* entity_create(Entity* entity){
-
     for(int i = 0; i < ENTITY_MAX; ++i){
         if(g_entity_registry[i] == nullptr){
             entity -> id = i;
@@ -29,7 +28,6 @@ Entity* entity_create(Entity* entity){
 
 //Safely delete Entity pointer while also cleaning entity_registry
 void entity_delete(uint id){
-
     //Recalculate g_entity_highest_id
     if(id == g_entity_highest_id){
         for(uint i = g_entity_highest_id; i >= 0; --i){
@@ -46,7 +44,6 @@ void entity_delete(uint id){
 
 //TODO: test each movement axis separately
 void entity_move(Entity* entity, Coord2d delta, bool respect_collisions){
-
     if(delta.x == 0 && delta.y == 0)
         return;
 
@@ -80,7 +77,6 @@ void entity_move(Entity* entity, Coord2d delta, bool respect_collisions){
 
 void entity_tick(){
     for(int i = 0; i <= g_entity_highest_id; ++i){
-
         g_entity_registry[i] -> move_state = MOVE_STATIONARY;
         entity_move(g_entity_registry[i], g_entity_registry[i]->velocity, true);
 
@@ -117,7 +113,6 @@ Coord2d entity_collision(Entity* entity, Coord2d delta){
     //Loop though tiles
     for(int x = tile.x - 2; x < tile.x + 2; x++){
         for(int y = tile.y - 2; y < tile.y + 2; y++){
-
             chunk = { (int)floor((double)x / 16.0),
                       (int)floor((double)y / 16.0) };
 
@@ -145,7 +140,6 @@ Coord2d entity_collision(Entity* entity, Coord2d delta){
                 else if(delta.x < 0){
                     maximum_delta_x = delta.x - (global_bb.p1.x - 0.001 - tile_bb.p2.x);
                 }
-
                 if(delta.y > 0){
                     maximum_delta_y = delta.y - (global_bb.p2.y + 0.001 - tile_bb.p1.y);
                 }
@@ -182,7 +176,6 @@ Coord2d entity_collision(Entity* entity, Coord2d delta){
             else if(delta.x < 0){
                 maximum_delta_x = delta.x - (global_bb.p1.x - 0.001 - ent_g_bb.p2.x);
             }
-
             if(delta.y > 0){
                 maximum_delta_y = delta.y - (global_bb.p2.y + 0.001 - ent_g_bb.p1.y);
             }

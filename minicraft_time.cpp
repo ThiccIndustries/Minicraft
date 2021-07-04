@@ -32,7 +32,6 @@ int time_get_framerate(){
 }
 
 Timer* time_timer_start(long duration){
-
     Timer* t = new Timer;
 
     t -> duration = duration;
@@ -43,7 +42,6 @@ Timer* time_timer_start(long duration){
 }
 
 bool time_timer_finished(Timer*& t){
-
     if(t == nullptr)
         return false;
 
@@ -70,5 +68,4 @@ void time_timer_cancel(Timer*& t){
 #endif
     delete t;
     t = nullptr;
-
 }

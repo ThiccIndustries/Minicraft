@@ -42,22 +42,18 @@ Block* g_block_registry[255] = {
 
         new Block{8,        TILE_SOLID,                     MAT_WOOD,   0,      0}, //Resource_Wood
         new Block{9,        TILE_SOLID,                     MAT_STONE,  0,      0}, //Resource_Stone
-
 };
 
 Item* g_item_registry[255] = {
         nullptr,    //g_item_registry[0] reserved for empty storage slots
-
 };
 
 void world_populate_chunk_buffer(const std::string& savename, Entity* viewport_e){
-
     int player_chunk_x = (int)(viewport_e -> position.x + (viewport_e -> camera.position.x)) / 256;
     int player_chunk_y = (int)(viewport_e -> position.y + (viewport_e -> camera.position.x)) / 256;
 
     for(int x = 0; x < RENDER_DISTANCE * 2; x++){
         for(int y = 0; y < RENDER_DISTANCE * 2; y++){
-
             int chunk_x = player_chunk_x - (x - RENDER_DISTANCE);
             int chunk_y = player_chunk_y - (y - RENDER_DISTANCE);
             int chunki = x + (y * RENDER_DISTANCE * 2);
@@ -100,7 +96,6 @@ Chunk* world_load_chunk(const std::string& savename, Coord2i coord, int seed){
     chunkptr -> foreground_tiles[(y1 * 16) + x1] = 1;
     */
     chunkptr -> pos = coord;
-
     world_chunkfile_write(savename, chunkptr);
 
     return chunkptr;
