@@ -15,7 +15,6 @@ void rendering_draw_healthbar(uint health, Texture* ui_texture, uint atlas_index
 void rendering_draw_cursor(Texture* ui_texture, uint atlas_index);
 
 GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint ws, uint rs, uint us){
-
     //Init GLFW
     if(glfwInit() != GLFW_TRUE){
         return nullptr;
@@ -39,10 +38,10 @@ GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint ws, uint rs
     glfwSetInputMode(windowptr, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     g_video_mode = {
-            {(int)window_x, (int)window_y},
-            (int)ws,
-            (int)rs,
-            (int)us,
+            {(int)window_x, (int)window_y}, //resolution
+            (int)ws,    //Window scale
+            (int)rs,    //World scale
+            (int)us,    //Ui scale
             windowptr
     };
 
@@ -68,7 +67,6 @@ void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Entity* viewport
 
     for(int y = 0; y < 16; y++){
         for(int x = 0; x < 16; x++){
-
             if(chunk_x + (x * 16) > RENDER_WINX || chunk_x + (x * 16) < -16)
                 continue;
             if(chunk_y + (y * 16) > RENDER_WINY || chunk_y + (y * 16) < -16)
@@ -121,8 +119,6 @@ void rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Entity* viewport
                     glColor1c(COLOR_WHITE);
                 }
             }
-
-
         }
     }
 }
@@ -188,7 +184,6 @@ void rendering_draw_entity(Entity* entity, Texture* atlas_texture, Entity* viewp
                 index += 0;
             else if(anim_tick >= anim_rate_d * 1)
                 index += 16;
-
     }
 
     //std::cout << inv_x << std::endl;
@@ -241,7 +236,6 @@ void rendering_draw_entity(Entity* entity, Texture* atlas_texture, Entity* viewp
         glEnd();
         glColor1c(COLOR_WHITE);
     }
-
 }
 
 void rendering_draw_entities(Texture* atlas_texture, Entity* viewport_e){
@@ -290,7 +284,6 @@ void rendering_draw_text(const std::string& text, uint size, Font* font, Color c
             glTexCoord2d(uv_x                           , uv_y + font -> t -> atlas_uvs.y   ); glVertex2i(pos_x           , pos_y + tilesize);
         }
         glEnd();
-
     }
 
     glColor1c(COLOR_WHITE);
@@ -334,7 +327,6 @@ void rendering_draw_healthbar(uint health, Texture* ui_texture, uint health_atla
 
     uint atlas_index = health_atlas1;
     for(uint i = 0; i < 10; ++i){
-
         atlas_index = health >= (i + 1) ? health_atlas1 : health_atlas2;
         uv_x = (atlas_index % (ui_texture -> width / ui_texture -> tile_size)) * ui_texture -> atlas_uvs.x;
         uv_y = (atlas_index / (ui_texture -> height / ui_texture -> tile_size)) * ui_texture -> atlas_uvs.y;
@@ -378,12 +370,13 @@ void rendering_draw_dialog(const std::string& title, const std::string& message,
     rendering_draw_text(title, 1, font, {255, 255, 255}, {(int)title_offset, (RENDER_WINY / 2) - (int)(font -> t -> tile_size / 2) - (2* (int)font -> t -> tile_size)});
     rendering_draw_text(message, 1, font, {255, 255, 255}, {(int)offset, (RENDER_WINY / 2) - (int)(font -> t -> tile_size / 2)});
 }
-void rendering_draw_hud(Entity_Player* player, Texture* ui_texture_sheet){
 
+void rendering_draw_hud(Entity_Player* player, Texture* ui_texture_sheet){
     //Draw cursor
     rendering_draw_healthbar(player -> health, ui_texture_sheet, 1, 2);
     rendering_draw_cursor(ui_texture_sheet, 0);
 }
+
 
 Coord2d rendering_viewport_to_world_pos(Entity* viewport_e, Coord2d coord){
     Coord2d position;

@@ -16,7 +16,7 @@ int main(int argc, char* argv[]){
     g_game_path = argv[0];
     std::string saveName = "test";
 
-    GLFWwindow* windowptr = rendering_init_opengl(RENDER_WINX, RENDER_WINY, RENDER_SCALE, 2, 2);
+    GLFWwindow* windowptr = rendering_init_opengl(RENDER_WINX, RENDER_WINY, RENDER_SCALE, 1, 1);
 
     //Load textures
     Font* font = new Font{
@@ -30,7 +30,9 @@ int main(int argc, char* argv[]){
     Texture* ent  = texture_load_bmp(get_resource_path(g_game_path, "resources/entity.bmp"), TEXTURE_MULTIPLE, 16);
 
     Entity_Player* player = (Entity_Player*) entity_create( ((Entity*)new Entity_Player)); //Entity 0
-    Entity* test_ent = entity_create(new Entity{ .position = {50, 50}, .bounds = {{5,10}, {11, 15}} });
+    Entity_Player* p2 = (Entity_Player*) entity_create( (Entity*)new Entity_Player );
+
+    //Entity* test_ent = entity_create(new Entity{ .position = {50, 50}, .bounds = {{5,10}, {11, 15}} });
     //Disable Vsync
     glfwSwapInterval(0);
 

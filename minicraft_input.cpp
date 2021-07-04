@@ -38,8 +38,8 @@ bool input_get_key(int keycode)         { return k_keys[keycode]; }
 bool input_get_button(int keycode)      { return m_keys[keycode]; }
 bool input_get_key_down(int keycode)    { return k_actions[keycode] == GLFW_PRESS; }
 bool input_get_key_up(int keycode)      { return k_actions[keycode] == GLFW_RELEASE; }
-bool input_get_button_down(int keycode)  { return m_actions[keycode] == GLFW_PRESS; }
-bool input_get_button_up(int keycode)    { return m_actions[keycode] == GLFW_RELEASE; }
+bool input_get_button_down(int keycode) { return m_actions[keycode] == GLFW_PRESS; }
+bool input_get_button_up(int keycode)   { return m_actions[keycode] == GLFW_RELEASE; }
 Coord2d input_mouse_position()          { return m_pos; }
 
 void input_poll_input(){

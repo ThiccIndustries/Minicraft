@@ -7,18 +7,16 @@
 #ifndef MINICRAFT_MINICRAFT_H
 #define MINICRAFT_MINICRAFT_H
 
-#pragma once
-
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "iostream"
 
 /*--- Settings, bitflags, and selectors ---*/
 
-#define RENDER_SCALE 2
+#define RENDER_SCALE 4
 #define RENDER_DISTANCE 3
 #define RENDER_WINX 480
-#define RENDER_WINY 320
+#define RENDER_WINY 270
 
 #define WORLD_PERLIN_SCALE 0.05
 #define WORLD_WATER_SCALE 0.25
@@ -177,7 +175,7 @@ typedef struct Entity_Player{
     }; //Entity inheritance
 
     Storage inventory;
-    uint    health = 10;
+    uint    health = 5;
 }Entity_Player;
 
 //World chunk
@@ -310,7 +308,6 @@ inline void error(const std::string& error_message, const std::string& console) 
     }
 
     glfwSetWindowShouldClose(g_video_mode.windowptr, 1);
-
 }
 
 inline int clampi(int a, int min, int max){
