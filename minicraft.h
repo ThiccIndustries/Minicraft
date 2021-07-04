@@ -7,22 +7,18 @@
 #ifndef MINICRAFT_MINICRAFT_H
 #define MINICRAFT_MINICRAFT_H
 
+#pragma once
+
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "iostream"
 
-
-//Remove strange double negative
-#ifndef NDEBUG
-    #define DEBUG
-#endif
-
 /*--- Settings, bitflags, and selectors ---*/
 
-#define RENDER_SCALE 4
+#define RENDER_SCALE 2
 #define RENDER_DISTANCE 3
-#define RENDER_WINX 240
-#define RENDER_WINY 160
+#define RENDER_WINX 480
+#define RENDER_WINY 320
 
 #define WORLD_PERLIN_SCALE 0.05
 #define WORLD_WATER_SCALE 0.25
@@ -41,7 +37,7 @@
 #define PLAYER_INVENTORY_SIZE       256
 #define PLAYER_INVENTORY_STACK_SIZE 64
 
-#define TIME_TPS    59
+#define TIME_TPS   64
 
 /*--- Enums and structs ---*/
 
@@ -69,12 +65,22 @@ enum MovementDirection{
     DIRECTION_WEST
 };
 
-typedef unsigned int  uint; //Shorthand unsigned int type
-typedef unsigned char uchar; //Shorthand unsigned char type
+typedef unsigned int  uint;     //Shorthand unsigned int type
+typedef unsigned char uchar;    //Shorthand unsigned char type
 
 //2D double coordinate
 typedef struct Coord2d{
     double x, y;
+
+    Coord2d operator+(const Coord2d& b) const{
+        return Coord2d{this->x + b.x, this->y + b.y};
+    }
+
+    bool operator==(const Coord2d& b) const{
+        return this->x == b.x && this->y == b.y;
+    }
+
+
 }Coord2d;
 
 //2D integer coordinate
@@ -89,8 +95,10 @@ typedef struct Color{
 
 //Video mode of the game window
 typedef struct Video_Mode{
-    Coord2i viewport;
-    int scale;
+    Coord2i window_resolution;
+    int window_scale;
+    int world_scale;
+    int ui_scale;
     GLFWwindow* windowptr;
 }Video_Mode;
 
@@ -150,6 +158,7 @@ typedef struct BoundingBox{
 typedef struct Entity{
     uint id;                //id of the entity in g_entity_registry
     Coord2d position;       //position of the Entity
+    Coord2d velocity;
     uint atlas_index;       //Index of the Upper-Left corner of sprites 3x3 sprite sheet //TODO: What?
     BoundingBox bounds;     //Bounding Box for entity
     Camera camera{{8,8}};   //TODO: Seems strange to give every ent. a camera, but i guess it could allow cool stuff like spectating? P.S. might be useful for multiplayer too.
@@ -179,9 +188,10 @@ typedef struct Chunk{
 }Chunk;
 
 typedef struct Time{
-    double delta;   //The time past between the previous and current frames
-    long   tick;    //The number of game ticks
-    double global;  //Absolute time since game was started
+    long   tick;        //The number of game ticks
+    double tick_delta;  //Real time since last tick
+    double delta;       //Time since last frame
+    double global;      //Absolute time since game was started
 } Time;
 
 //Timer reference ID
@@ -189,6 +199,12 @@ typedef struct Timer{
     long duration;
     long starting_tick;
 } Timer;
+
+/*--- Constants ---*/
+const Color COLOR_RED   = {255, 0  , 0};
+const Color COLOR_GREEN = {0  , 255, 0};
+const Color COLOR_BLUE  = {0  , 0  , 255};
+const Color COLOR_WHITE = {255, 255, 255};
 
 /*--- Global objects and registries. Globals are bad but so am I ---*/
 
@@ -206,6 +222,7 @@ extern uint     g_entity_highest_id; //The highest entity ID active in g_entity_
 
 //minicraft_main.cpp
 extern std::string g_game_path; //Global reference to argv[0]
+extern bool g_debug;
 
 //minicraft_rendering.cpp
 extern Video_Mode g_video_mode;
@@ -229,10 +246,10 @@ Chunk*  world_chunkfile_read(const std::string& savename, Coord2i ccoord);      
 void    world_chunkfile_write(const std::string& savename, Chunk* chunk);                               //write chunk to chunkfile
 
 //minicraft_rendering.cpp
-GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint scale);                                //Init OpenGL, GLFW, and create window
+GLFWwindow* rendering_init_opengl(uint window_x, uint window_y, uint ws, uint rs, uint us);                 //Init OpenGL, GLFW, and create window
 void        rendering_draw_chunk(Chunk* chunk, Texture* atlas_texture, Entity* viewport_e);                 //Draw a chunk
 void        rendering_draw_entity(Entity* entity, Texture* atlas_texture, Entity* viewport_e);              //Draw an entity
-void        rendering_draw_entities(Texture* atlas_texture, Entity* viewport_e);
+void        rendering_draw_entities(Texture* atlas_texture, Entity* viewport_e);                            //Draw all entities in g_entity_registry
 void        rendering_draw_chunk_buffer(Texture* atlas_texture, Entity* viewport_e);                        //Draw the chunk buffer
 void        rendering_draw_text(const std::string& text, uint size, Font* font, Color color, Coord2i pos);  //Draw text
 void        rendering_draw_hud(Entity_Player* player, Texture* ui_texture_sheet);                           //Draw hud
@@ -266,17 +283,23 @@ Entity* entity_create(Entity* entity);                                          
 void    entity_move(Entity* entity, Coord2d delta, bool respect_collisions);    //Move an entity
 void    entity_delete(uint id);                                                 //Removes entity to entity_registry and deletes Entity
 void    entity_tick();                                                          //Ticks all entities
+Coord2d entity_collision(Entity* entity, Coord2d delta);                        //Check entity collision
+bool    entity_AABB(BoundingBox a, BoundingBox b);                              //Check AABB collision
 
 //minicraft_storage.cpp
-int storage_add_item(Storage* storage, uint item_id, uint item_count);
+int storage_add_item(Storage* storage, uint item_id, uint item_count);  //Useless
 
 
 /*---inline util functions---*/
 
-inline void error(const std::string& error_message, const std::string& console){
-#ifndef NDEBUG
-    std::cout << console << std::endl;
-#endif
+inline void glColor1c(const Color& c){
+    glColor3ub(c.r, c.b, c.g);
+}
+
+inline void error(const std::string& error_message, const std::string& console) {
+    if (g_debug){
+        std::cout << console << std::endl;
+    }
     Timer* t = time_timer_start(TIME_TPS * 10);
 
     while(!time_timer_finished(t)){

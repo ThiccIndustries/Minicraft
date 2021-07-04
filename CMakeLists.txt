@@ -10,6 +10,6 @@ add_executable(Minicraft minicraft.h minicraft_main.cpp minicraft_rendering.cpp 
 target_link_libraries(Minicraft -lGLEW -lglfw -lGL)
 
 file(MAKE_DIRECTORY resources)
-add_custom_command( TARGET Minicraft POST_BUILD
+add_custom_command( TARGET Minicraft PRE_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_directory
                             ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}/resources)

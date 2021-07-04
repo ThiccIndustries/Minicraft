@@ -10,7 +10,6 @@ Time* g_time = new Time;
 
 
 void (* tick_callback)();
-double time_since_tick = 0;
 
 int time_timer_purge();
 
@@ -18,14 +17,14 @@ void time_update_time(double glfw_time){
     g_time -> delta = glfw_time - g_time -> global;
     g_time -> global = glfw_time;
 
-    if(time_since_tick >= 1.0 / TIME_TPS) {
+    if(g_time -> tick_delta >= 1.0 / TIME_TPS) {
         g_time->tick++;
         tick_callback();
 
-        time_since_tick = 0;
+        g_time -> tick_delta = 0;
     }
     else
-        time_since_tick += g_time -> delta;
+        g_time -> tick_delta += g_time -> delta;
 }
 
 int time_get_framerate(){
