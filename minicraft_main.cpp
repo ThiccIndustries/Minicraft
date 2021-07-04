@@ -48,7 +48,6 @@ int main(int argc, char* argv[]){
     Timer* t = time_timer_start(TIME_TPS / 2);
 
     while(!glfwWindowShouldClose(windowptr)){
-
         input_poll_input();
         time_update_time(glfwGetTime());
 

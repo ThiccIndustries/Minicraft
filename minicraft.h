@@ -77,8 +77,6 @@ typedef struct Coord2d{
     bool operator==(const Coord2d& b) const{
         return this->x == b.x && this->y == b.y;
     }
-
-
 }Coord2d;
 
 //2D integer coordinate
