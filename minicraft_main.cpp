@@ -11,12 +11,14 @@ std::string g_game_path;
 bool g_debug = false;
 
 void tick();
+void entity_tick_callback(Entity* e);
+
+std::string g_world_name = "test";
 
 int main(int argc, char* argv[]){
     g_game_path = argv[0];
-    std::string saveName = "test";
 
-    GLFWwindow* windowptr = rendering_init_opengl(RENDER_WINX, RENDER_WINY, RENDER_SCALE, 1, 1);
+    GLFWwindow* windowptr = rendering_init_opengl(RENDER_WINX, RENDER_WINY, 2, 2, 2);
 
     //Load textures
     Font* font = new Font{
@@ -30,9 +32,10 @@ int main(int argc, char* argv[]){
     Texture* ent  = texture_load_bmp(get_resource_path(g_game_path, "resources/entity.bmp"), TEXTURE_MULTIPLE, 16);
 
     Entity_Player* player = (Entity_Player*) entity_create( ((Entity*)new Entity_Player)); //Entity 0
-    Entity_Player* p2 = (Entity_Player*) entity_create( (Entity*)new Entity_Player );
+    Entity_Player* p2 = (Entity_Player*) entity_create( (Entity*)new Entity_Player );      //Temporary test entity
 
-    //Entity* test_ent = entity_create(new Entity{ .position = {50, 50}, .bounds = {{5,10}, {11, 15}} });
+    p2 -> e.position = {16, 16};
+
     //Disable Vsync
     glfwSwapInterval(0);
 
@@ -43,6 +46,11 @@ int main(int argc, char* argv[]){
     Timer* timer = nullptr;
 
     time_set_tick_callback(&tick);
+    entity_set_entity_tick_callback(&entity_tick_callback);
+    world_set_chunk_callbacks(
+            &world_load_chunk,
+            &world_unload_chunk
+            );
 
     uint fps = 0;
     Timer* t = time_timer_start(TIME_TPS / 2);
@@ -51,11 +59,11 @@ int main(int argc, char* argv[]){
         input_poll_input();
         time_update_time(glfwGetTime());
 
-        world_populate_chunk_buffer(saveName,   (Entity*)player);
-        rendering_draw_chunk_buffer(terr,       (Entity*)player);
-        rendering_draw_entities(ent,            (Entity*)player);
+        world_populate_chunk_buffer(g_world_name,   (Entity*)player);
+        rendering_draw_chunk_buffer(terr,           (Entity*)player);
+        rendering_draw_entities(ent,                (Entity*)player);
 
-        rendering_draw_hud(player, ui);
+        rendering_draw_hud(player -> health, ui);
 
         if(g_debug){
             if(time_timer_finished(t)){
@@ -88,7 +96,7 @@ int main(int argc, char* argv[]){
                 std::cout << "c:" << chunk.x << "," << chunk.y << " t:" << tile.x << "," << tile.y <<std::endl;
             }
 
-            world_modify_chunk(saveName, chunk, tile, index);
+            world_modify_chunk(g_world_name, chunk, tile, index);
         }
 
         if(input_get_button(GLFW_MOUSE_BUTTON_1)){
@@ -117,6 +125,16 @@ int main(int argc, char* argv[]){
     glfwTerminate();
 
     return 0;
+}
+
+void entity_tick_callback(Entity* e){
+    switch(e -> type){
+        case ENT_PLAYER:
+            if( ((Entity_Player*)e) -> health == 0){
+                error("You were slain.", "Player died on tick: " + std::to_string(g_time -> tick));
+            }
+            break;
+    }
 }
 
 void tick(){
