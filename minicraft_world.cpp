@@ -6,6 +6,14 @@
 
 #include "minicraft.h"
 
+//Mat type
+enum Material{
+    MAT_STONE,      //Requires pickaxe to break effectively
+    MAT_WOOD,       //Requires axe to break effectively
+    MAT_EARTH,      //Requires shovel to break effectively
+    MAT_SOLID       //Cannot harvest
+};
+
 Block* g_block_registry[255] = {
         /*        Block Definitions------------------------------------------------------
                   Texture   Options                         Material    DropID  DropCount */
