@@ -42,7 +42,7 @@ Block* g_block_registry[255] = {
 };
 
 Chunk* world_load_chunk(Coord2i coord){
-    Chunk* chunkptr = world_chunkfile_read(g_world_name, coord );
+    Chunk* chunkptr = world_chunkfile_read("saves/" + g_world_name + "/chunks", coord );
 
     //Chunk successfully loaded from file
     if(chunkptr != nullptr) return chunkptr;
@@ -58,13 +58,13 @@ Chunk* world_load_chunk(Coord2i coord){
     }
 
     chunkptr -> pos = coord;
-    world_chunkfile_write(g_world_name, chunkptr);
+    world_chunkfile_write("saves/" + g_world_name + "/chunks", chunkptr);
 
     return chunkptr;
 }
 
 void world_unload_chunk(Chunk* chunk){
     //TODO: save chunks to file
-    world_chunkfile_write(g_world_name, chunk);
+    world_chunkfile_write("saves/" + g_world_name + "/chunks", chunk);
     delete chunk;
 }

@@ -18,7 +18,7 @@ std::string g_world_name = "test";
 int main(int argc, char* argv[]){
     g_game_path = argv[0];
 
-    GLFWwindow* windowptr = rendering_init_opengl(RENDER_WINX, RENDER_WINY, 2, 2, 2);
+    GLFWwindow* windowptr = rendering_init_opengl(RENDER_WINX, RENDER_WINY, 3, 2, 2);
 
     //Load textures
     Font* font = new Font{
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]){
     Texture* ent  = texture_load_bmp(get_resource_path(g_game_path, "resources/entity.bmp"), TEXTURE_MULTIPLE, 16);
 
     Entity_Player* player = (Entity_Player*) entity_create( ((Entity*)new Entity_Player)); //Entity 0
-    Entity_Player* p2 = (Entity_Player*) entity_create( (Entity*)new Entity_Player );      //Temporary test entity
+    Entity_Zombie* p2 = (Entity_Zombie*) entity_create( (Entity*)new Entity_Zombie );      //Temporary test entity
 
     p2 -> e.position = {16, 16};
 
@@ -59,9 +59,9 @@ int main(int argc, char* argv[]){
         input_poll_input();
         time_update_time(glfwGetTime());
 
-        world_populate_chunk_buffer(g_world_name,   (Entity*)player);
-        rendering_draw_chunk_buffer(terr,           (Entity*)player);
-        rendering_draw_entities(ent,                (Entity*)player);
+        world_populate_chunk_buffer(        (Entity*)player );
+        rendering_draw_chunk_buffer( terr,  (Entity*)player );
+        rendering_draw_entities( ent,       (Entity*)player );
 
         rendering_draw_hud(player -> health, ui);
 
@@ -96,7 +96,8 @@ int main(int argc, char* argv[]){
                 std::cout << "c:" << chunk.x << "," << chunk.y << " t:" << tile.x << "," << tile.y <<std::endl;
             }
 
-            world_modify_chunk(g_world_name, chunk, tile, index);
+            world_modify_chunk(chunk, tile, index);
+            world_chunkfile_write("saves/" + g_world_name + "/chunks", world_get_chunk(chunk));
         }
 
         if(input_get_button(GLFW_MOUSE_BUTTON_1)){
@@ -104,12 +105,12 @@ int main(int argc, char* argv[]){
         }
 
         if(input_get_key_down(GLFW_KEY_Q)){
-            index = clampi(index - 1, 0, 22);
+            index = clampui(index - 1, 0, 22);
             player -> health --;
         }
 
         if(input_get_key_down(GLFW_KEY_E)){
-            index = clampi(index + 1, 0, 22);
+            index = clampui(index + 1, 0, 22);
             player -> health ++;
         }
 
@@ -129,11 +130,51 @@ int main(int argc, char* argv[]){
 
 void entity_tick_callback(Entity* e){
     switch(e -> type){
-        case ENT_PLAYER:
-            if( ((Entity_Player*)e) -> health == 0){
-                error("You were slain.", "Player died on tick: " + std::to_string(g_time -> tick));
+        case ENT_PLAYER: {
+            if (((Entity_Player *) e)->health == 0) {
+                error("You were slain.", "Player died on tick: " + std::to_string(g_time->tick));
             }
             break;
+        }
+        case ENT_ZOMBIE: {
+            Entity_Zombie* e1 = (Entity_Zombie*) e;
+
+            //Reset target if beyond target distance
+            if (e1->target != nullptr) {
+                e1->e.velocity = {0,0};
+
+                double targetDist = distancec2d(e1->target->position, e1->e.position);
+                //Target is beyond follow distance
+                if(targetDist > e1->follow_range) {
+                    e1->target = nullptr;
+                    break; //Wait next tick
+                }
+
+                //Zombie should move
+                //if(targetDist >= e1->attack_range) {
+                    if (e1->e.position.x - e1->target->position.x >= 1 || e1->e.position.x - e1->target->position.x <= -1)
+                        e1->e.velocity.x = e1->movementSpeed * ((e1->e.position.x < e1->target->position.x) ? 1 : -1);
+
+                    if (e1->e.position.y - e1->target->position.y >= 1 || e1->e.position.y - e1->target->position.y <= -1)
+                        e1->e.velocity.y = e1->movementSpeed * ((e1->e.position.y < e1->target->position.y) ? 1 : -1);
+                //}
+
+
+            } else {
+
+                for (int i = 0; i < g_entity_highest_id; i++) {
+                    //Skip self
+                    if (i == e1->e.id)
+                        continue;
+                    //Found new target
+                    if (g_entity_registry[i] -> type == ENT_PLAYER && distancec2d(g_entity_registry[i]->position, e1->e.position) <= e1->follow_range) {
+                        e1->target = g_entity_registry[i];
+                        break;
+                    }
+                }
+            }
+
+        }
     }
 }
 
