@@ -31,10 +31,10 @@ int main(int argc, char* argv[]){
     Texture* ui   = texture_load_bmp(get_resource_path(g_game_path, "resources/ui.bmp"), TEXTURE_MULTIPLE, 8);
     Texture* ent  = texture_load_bmp(get_resource_path(g_game_path, "resources/entity.bmp"), TEXTURE_MULTIPLE, 16);
 
-    Entity_Player* player = (Entity_Player*) entity_create( ((Entity*)new Entity_Player)); //Entity 0
-    Entity_Zombie* p2 = (Entity_Zombie*) entity_create( (Entity*)new Entity_Zombie );      //Temporary test entity
-
-    p2 -> e.position = {16, 16};
+    Entity_Player*   player     = (Entity_Player*) entity_create( (Entity*)new Entity_Player); //Entity 0
+    Entity_Skeleton* p2         = (Entity_Skeleton*) entity_create( (Entity*)new Entity_Skeleton  );      //Temporary test entity
+    //Entity_Zombie*   zombabboy  = (Entity_Zombie*) entity_create( (Entity*)new Entity_Zombie );
+    p2 -> e.e.position = {100, 100};
 
     //Disable Vsync
     glfwSwapInterval(0);
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]){
 
     uint fps = 0;
     Timer* t = time_timer_start(TIME_TPS / 2);
-
+    std::cout << player << std::endl;
     while(!glfwWindowShouldClose(windowptr)){
         input_poll_input();
         time_update_time(glfwGetTime());
@@ -64,6 +64,8 @@ int main(int argc, char* argv[]){
         rendering_draw_entities( ent,       (Entity*)player );
 
         rendering_draw_hud(player -> health, ui);
+
+
 
         if(g_debug){
             if(time_timer_finished(t)){
@@ -78,7 +80,7 @@ int main(int argc, char* argv[]){
         if(input_get_key_down(GLFW_KEY_F3)){
             g_debug = !g_debug;
         }
-        
+
         if(input_get_button_up(GLFW_MOUSE_BUTTON_1)) {
             time_timer_cancel(timer);
         }
@@ -136,8 +138,9 @@ void entity_tick_callback(Entity* e){
             }
             break;
         }
-        case ENT_ZOMBIE: {
-            Entity_Zombie* e1 = (Entity_Zombie*) e;
+        case ENT_ZOMBIE:
+        case ENT_SKELETON: {
+            Entity_Enemy * e1 = (Entity_Enemy*) e;
 
             //Reset target if beyond target distance
             if (e1->target != nullptr) {
@@ -150,21 +153,53 @@ void entity_tick_callback(Entity* e){
                     break; //Wait next tick
                 }
 
-                //Zombie should move
-                //if(targetDist >= e1->attack_range) {
-                    if (e1->e.position.x - e1->target->position.x >= 1 || e1->e.position.x - e1->target->position.x <= -1)
-                        e1->e.velocity.x = e1->movementSpeed * ((e1->e.position.x < e1->target->position.x) ? 1 : -1);
+                //Enemy should move
+                double delta_x = (e1->target->position.x) - e1 -> e.position.x;
+                double delta_y = (e1->target->position.y) - e1 -> e.position.y;
 
-                    if (e1->e.position.y - e1->target->position.y >= 1 || e1->e.position.y - e1->target->position.y <= -1)
-                        e1->e.velocity.y = e1->movementSpeed * ((e1->e.position.y < e1->target->position.y) ? 1 : -1);
-                //}
+                double theta_radians = atan2(delta_y, delta_x);
+                e1 -> e.velocity = {e1 -> movementSpeed * cos(theta_radians), e1 -> movementSpeed * sin(theta_radians)};
 
+                //Attack
+                if(e1 -> attack_timer == nullptr || time_timer_finished(e1 -> attack_timer)){
+                    e1 -> attack_timer = time_timer_start(e1 -> attack_time);
+                    if(e1 -> e.type == ENT_ZOMBIE){}
+                    if(e1 -> e.type == ENT_SKELETON){
+                        Entity_Projectile_Bone* proj = (Entity_Projectile_Bone*)entity_create((Entity*)new Entity_Projectile_Bone);
+                        proj -> e.e.position = e1 -> e.position;
+                        proj -> e.target = e1 -> target;
+                        proj -> e.movementSpeed = (4.0 * 16) / TIME_TPS;
+                        double delta_x = (proj -> e.target->position.x) - proj -> e.e.position.x;
+                        double delta_y = (proj -> e.target->position.y) - proj -> e.e.position.y;
+
+                        double dist_time_x = (delta_x / proj -> e.movementSpeed);
+                        double dist_time_y = (delta_y / proj -> e.movementSpeed);
+
+                        delta_x += proj -> e.target->velocity.x * dist_time_x;
+                        delta_y += proj -> e.target->velocity.y * dist_time_y;
+
+                        double theta_radians = atan2(delta_y, delta_x);
+                        Coord2d v = {cos(theta_radians), sin(theta_radians)};
+
+                        proj -> e.e.velocity = { proj -> e.movementSpeed * v.x, proj -> e.movementSpeed * v.y};
+
+                        proj -> e.e.position = proj -> e.e.position + Coord2d{18 * v.x, 18 * v.y};
+
+                        proj -> e.lifetime_timer = time_timer_start(proj -> e.lifetime);
+
+                    }
+
+
+                }
 
             } else {
 
                 for (int i = 0; i < g_entity_highest_id; i++) {
                     //Skip self
                     if (i == e1->e.id)
+                        continue;
+
+                    if(g_entity_registry[i] == nullptr)
                         continue;
                     //Found new target
                     if (g_entity_registry[i] -> type == ENT_PLAYER && distancec2d(g_entity_registry[i]->position, e1->e.position) <= e1->follow_range) {
@@ -173,7 +208,9 @@ void entity_tick_callback(Entity* e){
                     }
                 }
             }
-
+            break;
+        }
+        case ENT_PROJ_BONE:{
         }
     }
 }
