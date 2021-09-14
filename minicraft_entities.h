@@ -13,11 +13,15 @@ enum EntityType{
     ENT_GENERIC,
     ENT_PLAYER,
     ENT_ENEMY,
-    ENT_PROJ,
     ENT_ZOMBIE,
     ENT_SKELETON,
-    ENT_PROJ_BONE
+    ENT_BONE
 };
+
+void entity_tick_player(Entity* e);
+void entity_tick_enemy(Entity* e);
+void entity_tick_bone(Entity* e);
+void entity_tick_skeleton(Entity* e);
 
 //Player
 typedef struct Entity_Player{
@@ -35,6 +39,7 @@ typedef struct Entity_Player{
         e.hit_bounds        = {{2, 0}, {14, 15}};
         e.animation_rate    = TIME_TPS;
         e.type              = ENT_PLAYER;
+        e.tick_func         = &entity_tick_player;
 
         movementSpeed   = ((3.0 * 16) / TIME_TPS);
         health          = 5;
@@ -59,23 +64,9 @@ typedef struct Entity_Enemy{
         e.hit_bounds        = {{2, 0}, {14, 15}};
         e.animation_rate    = TIME_TPS;
         e.type = ENT_ENEMY;
+        e.tick_func = &entity_tick_enemy;
     }
 }Entity_Enemy;
-
-typedef struct Entity_Projectile{
-    Entity e;
-
-    double  movementSpeed;
-    double  lifetime;
-    Timer*  lifetime_timer;
-    Entity* target;
-
-    Entity_Projectile() {
-        e.type = ENT_PROJ;
-        lifetime_timer  = nullptr;
-        target          = nullptr;
-    }
-} Entity_Projectile;
 
 typedef struct Entity_Zombie{
     Entity_Enemy e;
@@ -97,6 +88,7 @@ typedef struct Entity_Skeleton{
     Entity_Skeleton(){
         e.e.atlas_index = 6;
         e.e.type        = ENT_SKELETON;
+        e.e.tick_func   = &entity_tick_skeleton;
         e.movementSpeed = ((1.5 * 16) / TIME_TPS);
         e.health        = 10;
         e.attack_range  = 5 * 16;
@@ -105,24 +97,31 @@ typedef struct Entity_Skeleton{
     }
 }Entity_Skeleton;
 
-typedef struct Entity_Projectile_Bone{
-    Entity_Projectile e;
+typedef struct Entity_Bone{
+    Entity e;
 
-    Entity_Projectile_Bone() {
-        e.e.atlas_index = 27;
-        e.e.spritesheet_size = {1, 2};
-        e.e.frame_count = 2;
-        e.e.frame_order = new uint[]{0, 1};
-        e.e.col_bounds  = {{2, 2}, {9, 9}};
-        e.e.hit_bounds  = {{1, 1}, {10, 10}};
-        e.e.animation_rate = 16;
-        e.e.type = ENT_PROJ_BONE;
+    double  movementSpeed;
+    double  lifetime;
+    Timer*  lifetime_timer;
+    Entity* target;
 
-        e.movementSpeed   = ((5.0 * 16) / TIME_TPS);
-        e.lifetime        = 2 * TIME_TPS;
-        e.lifetime_timer  = nullptr;
-        e.target          = nullptr;
+    Entity_Bone() {
+        e.atlas_index = 27;
+        e.spritesheet_size = {1, 2};
+        e.frame_count = 2;
+        e.frame_order = new uint[]{0, 1};
+        e.col_bounds  = {{2, 2}, {9, 9}};
+        e.hit_bounds  = {{1, 1}, {10, 10}};
+        e.animation_rate = 16;
+        e.type = ENT_BONE;
+        e.tick_func = entity_tick_bone;
+
+        movementSpeed   = ((5.0 * 16) / TIME_TPS);
+        lifetime        = 2 * TIME_TPS;
+        lifetime_timer  = nullptr;
+        target          = nullptr;
     }
-}Entity_Projectile_Bone;
+}Entity_Bone;
+
 
 #endif //MINICRAFT_CB_MINICRAFT_ENTITIES_H

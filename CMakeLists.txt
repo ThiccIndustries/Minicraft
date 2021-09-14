@@ -6,7 +6,7 @@ include_directories(${CMAKE_SOURCE_DIR}\\Geode-Engine\\)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
 
-add_executable(Minicraft minicraft.h minicraft_main.cpp minicraft_world.cpp minicraft_entities.h)
+add_executable(Minicraft minicraft.h minicraft_main.cpp minicraft_world.cpp minicraft_entities.h minicraft_entities.cpp)
 target_link_libraries(Minicraft Geode-Lib)
 
 add_custom_command( TARGET Minicraft PRE_BUILD
