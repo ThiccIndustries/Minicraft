@@ -82,4 +82,14 @@ void entity_tick_skeleton(Entity* e){
     proj -> lifetime_timer = time_timer_start(proj -> lifetime);
 
 }
-void entity_tick_bone(Entity* e){}
+
+void entity_tick_bone(Entity* e){
+    Entity_Bone* e1 = (Entity_Bone*)e;
+
+    Entity* hit = entity_hit((Entity*)e1, ((Entity*)e1) -> velocity);
+    if( hit != nullptr && hit -> type == ENT_PLAYER){
+        ((Entity_Player*)hit) -> health--;
+        entity_delete( ((Entity*)e1) -> id );
+    }
+
+}

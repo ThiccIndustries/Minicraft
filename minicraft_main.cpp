@@ -34,6 +34,7 @@ int main(int argc, char* argv[]){
     //Entity_Zombie*   zombabboy  = (Entity_Zombie*) entity_create( (Entity*)new Entity_Zombie );
     p2 -> e.e.position = {100, 100};
 
+    ((Entity*)player) -> position = {0, 0};
     //Disable Vsync
     glfwSwapInterval(0);
 
