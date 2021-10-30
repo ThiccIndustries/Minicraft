@@ -12,14 +12,29 @@
 #include "geode.h"
 #include "iostream"
 
+#define TILE_COLLECTABLE 0b00001000
+
+//Entities
 #include "minicraft_entities.h"
 
-extern std::string g_world_name;
-//Entities
+//Structures
+typedef struct Structure{
+    Coord2i size;
+    uchar* tiles;
+} Structure;
 
+typedef struct Save{
+    std::string world_name;
+    Coord2i player_position;
+    long seed;
+};
 
+extern Save*      g_save;
+extern Structure* g_structures[255];
 
 //Functions
-Chunk* world_load_chunk(Coord2i coord);
-void world_unload_chunk(Chunk* chunk);
+Chunk*  world_load_chunk(Coord2i coord);
+void    world_unload_chunk(Chunk* chunk);
+Save*   world_load_game(const std::string& world_name);
+void    world_save_game(Save* save);
 #endif

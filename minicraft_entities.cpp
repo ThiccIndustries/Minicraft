@@ -12,7 +12,29 @@ void entity_tick_callback(Entity* e){
 }
 
 void entity_tick_player(Entity* e){
+    Entity_Player* player = (Entity_Player*)e;
 
+    if(time_timer_finished(player -> collect_timer)) {
+        Coord2d worldspace_pos = rendering_viewport_to_world_pos(e, input_mouse_position());
+
+        Coord2i chunk{(int) floor(worldspace_pos.x / 256.0),
+                      (int) floor(worldspace_pos.y / 256.0)};
+
+        Coord2i tile{(int) (worldspace_pos.x - (chunk.x * 256)) / 16,
+                     (int) (worldspace_pos.y - (chunk.y * 256)) / 16};
+
+        if (g_debug) {
+            std::cout << "c:" << chunk.x << "," << chunk.y << " t:" << tile.x << "," << tile.y << std::endl;
+        }
+    }
+
+    if(time_timer_finished(player -> stamina_timer)) {
+        player->stamina = clampi(
+                input_get_key(GLFW_KEY_LEFT_SHIFT) ? (player->stamina - 1) : (player->stamina + 1),
+                0, 10);
+
+        player->stamina_timer = time_timer_start(TIME_TPS);
+    }
 }
 void entity_tick_enemy(Entity* e){
     Entity_Enemy* e1 = (Entity_Enemy*)e;
@@ -31,6 +53,11 @@ void entity_tick_enemy(Entity* e){
         //Enemy should move
         double delta_x = (e1->target->position.x) - e1 -> e.position.x;
         double delta_y = (e1->target->position.y) - e1 -> e.position.y;
+
+        if(std::abs(delta_x) > std::abs(delta_y))
+            e -> direction = delta_x > 0 ? DIRECTION_EAST : DIRECTION_WEST;
+        else
+            e -> direction = delta_y > 0 ? DIRECTION_SOUTH : DIRECTION_NORTH;
 
         double theta_radians = atan2(delta_y, delta_x);
         e1 -> e.velocity = {e1 -> movementSpeed * cos(theta_radians), e1 -> movementSpeed * sin(theta_radians)};
@@ -69,27 +96,35 @@ void entity_tick_skeleton(Entity* e){
     proj -> e.position = e1 -> e.position;
     proj -> target = e1 -> target;
     proj -> movementSpeed = (4.0 * 16) / TIME_TPS;
-    double delta_x = (proj -> target->position.x) - proj -> e.position.x;
-    double delta_y = (proj -> target->position.y) - proj -> e.position.y;
 
-    double theta_radians = atan2(delta_y, delta_x);
-    Coord2d v = {cos(theta_radians), sin(theta_radians)};
+    //Recenter coordinate space
+
+    double target_x = proj -> target->position.x + (proj -> target -> velocity.x * distancec2d(proj -> e.position, proj -> target -> position) / proj -> movementSpeed);
+    double target_y = proj -> target->position.y + (proj -> target -> velocity.y * distancec2d(proj -> e.position, proj -> target -> position) / proj -> movementSpeed);
+
+    double normal_x = target_x - proj -> e.position.x;
+    double normal_y = target_y - proj -> e.position.y;
+
+    double theta = atan2(normal_y, normal_x);
+    const double r = 1;
+    Coord2d v = {r * cos(theta), r * sin(theta)};
 
     proj -> e.velocity = { proj -> movementSpeed * v.x, proj -> movementSpeed * v.y};
-
     proj -> e.position = proj -> e.position + Coord2d{18 * v.x, 10 * v.y};
-
     proj -> lifetime_timer = time_timer_start(proj -> lifetime);
-
 }
 
 void entity_tick_bone(Entity* e){
     Entity_Bone* e1 = (Entity_Bone*)e;
 
     Entity* hit = entity_hit((Entity*)e1, ((Entity*)e1) -> velocity);
-    if( hit != nullptr && hit -> type == ENT_PLAYER){
-        ((Entity_Player*)hit) -> health--;
+    if( hit != nullptr){
+        entity_damage(hit, 1);
         entity_delete( ((Entity*)e1) -> id );
+    }
+
+    if(time_timer_finished(e1 -> lifetime_timer)){
+        entity_delete(e -> id);
     }
 
 }
