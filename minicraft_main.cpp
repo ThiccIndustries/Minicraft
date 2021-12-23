@@ -53,6 +53,7 @@ int main(int argc, char* argv[]){
             );
 
     uint fps = 0;
+    float ftime = 0.0;
     Timer* t = time_timer_start(TIME_TPS / 2);
 
     while(!glfwWindowShouldClose(windowptr)){
@@ -94,9 +95,11 @@ int main(int argc, char* argv[]){
             if(time_timer_finished(t)){
                 t = time_timer_start(TIME_TPS / 4);
                 fps = clampi(time_get_framerate(), 0, 99999);
+                ftime = g_time -> delta;
             }
 
-            rendering_draw_text("Fps:" + std::to_string(fps), g_video_mode.ui_scale, font, {255, 255, 255}, {g_video_mode.window_resolution.x - (double)(font -> t -> tile_size * 10 * g_video_mode.ui_scale), 2} );
+        rendering_draw_text("Fps:" + std::to_string(fps), g_video_mode.ui_scale, font, {255, 255, 255}, {g_video_mode.window_resolution.x - (double)(font -> t -> tile_size * 10 * g_video_mode.ui_scale), 0} );
+        rendering_draw_text(" us:" + std::to_string(ftime * 1000.0f), g_video_mode.ui_scale, font, {255, 255, 255}, {g_video_mode.window_resolution.x - (double)(font -> t -> tile_size * 10 * g_video_mode.ui_scale), 8} );
         //}
 
         if(input_get_key_down(GLFW_KEY_F3)){
@@ -130,7 +133,6 @@ int main(int argc, char* argv[]){
 
         glfwSwapBuffers(windowptr);
     }
-    std::cout << "Saving game!" << std::endl;
     world_save_game(g_save);
 
     entity_delete(0); //Delete player

@@ -27,7 +27,12 @@ typedef struct Save{
     std::string world_name;
     Coord2i player_position;
     long seed;
-};
+} Save;
+
+typedef struct Item{
+    uint atlas_index;
+
+} Item;
 
 extern Save*      g_save;
 extern Structure* g_structures[255];

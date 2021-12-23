@@ -24,7 +24,7 @@ void entity_tick_player(Entity* e){
                      (int) (worldspace_pos.y - (chunk.y * 256)) / 16};
 
         if (g_debug) {
-            std::cout << "c:" << chunk.x << "," << chunk.y << " t:" << tile.x << "," << tile.y << std::endl;
+               std::cout << "c:" << chunk.x << "," << chunk.y << " t:" << tile.x << "," << tile.y << std::endl;
         }
     }
 
@@ -106,25 +106,46 @@ void entity_tick_skeleton(Entity* e){
     double normal_y = target_y - proj -> e.position.y;
 
     double theta = atan2(normal_y, normal_x);
-    const double r = 1;
-    Coord2d v = {r * cos(theta), r * sin(theta)};
+    Coord2d v = {cos(theta), sin(theta)};
 
     proj -> e.velocity = { proj -> movementSpeed * v.x, proj -> movementSpeed * v.y};
     proj -> e.position = proj -> e.position + Coord2d{18 * v.x, 10 * v.y};
     proj -> lifetime_timer = time_timer_start(proj -> lifetime);
 }
-
 void entity_tick_bone(Entity* e){
     Entity_Bone* e1 = (Entity_Bone*)e;
 
     Entity* hit = entity_hit((Entity*)e1, ((Entity*)e1) -> velocity);
     if( hit != nullptr){
-        entity_damage(hit, 1);
-        entity_delete( ((Entity*)e1) -> id );
+        //entity_damage(hit, 1);
+        entity_death_bone(e);
     }
 
-    if(time_timer_finished(e1 -> lifetime_timer)){
+}
+
+void entity_death_player(Entity* e){
+    error("Game Over.", "Player died on tick: " + std::to_string(g_time -> tick));
+    entity_delete(e -> id);
+    g_time -> paused = true;
+}
+
+void entity_death_enemy(Entity* e){
+    entity_delete(e -> id);
+}
+
+void entity_death_skeleton(Entity* e){
+    entity_delete(e -> id);
+}
+
+void entity_death_bone(Entity* e){
+    e -> health = 0;
+    Entity_Bone* eb = (Entity_Bone*)e;
+    std::cout << e->id << std::endl;
+    e -> velocity = {0, 0};
+    e -> atlas_index = 34;
+    e -> animation_rate = 64;
+    time_callback_start(16, [](void* v){
+        Entity* e = (Entity*)v;
         entity_delete(e -> id);
-    }
-
+    }, e);
 }

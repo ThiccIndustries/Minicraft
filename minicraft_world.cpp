@@ -93,19 +93,6 @@ Block* g_block_registry[255] = {
 };
 
 
-//Structures
-
-Structure* g_structures[255]{
-    //Tree
-    new Structure{
-            {1, 2},
-            new uchar[]{2,
-                        1}
-    }
-
-
-};
-
 Chunk* world_load_chunk(Coord2i coord){
     Chunk* chunkptr = world_chunkfile_read("saves/" + g_save -> world_name + "/chunks", coord );
 
