@@ -38,8 +38,12 @@ int main(int argc, char* argv[]){
     player = (Entity_Player*) entity_create( (Entity*)new Entity_Player); //Entity 0
 
     player -> e.position = Coord2d{(double)g_save->player_position.x, (double)g_save->player_position.y};
-    Entity_Skeleton* skeleton = (Entity_Skeleton*) entity_create((Entity*)new Entity_Skeleton);
 
+    Entity_Skeleton* zambabe = (Entity_Skeleton*) entity_create( (Entity*)new Entity_Skeleton );
+    zambabe -> e.e.position = Coord2d{(double)g_save->player_position.x - 64, (double)g_save->player_position.y};
+
+    Entity_Zombie* zambabe2 = (Entity_Zombie*) entity_create( (Entity*)new Entity_Zombie );
+    zambabe2 -> e.e.position = Coord2d{(double)g_save->player_position.x + 16, (double)g_save->player_position.y};
     //Disable Vsync
     glfwSwapInterval(0);
 
@@ -64,6 +68,7 @@ int main(int argc, char* argv[]){
         world_populate_chunk_buffer((Entity*)player);
 
         rendering_draw_chunk_buffer((Entity*)player);
+
         rendering_draw_entities(ent,       (Entity*)player);
         rendering_draw_bar(player -> e.health,  {0, 0}, ui, 8);
         rendering_draw_bar(player -> stamina,   {0, (int)ui -> tile_size}, ui, 16);
@@ -87,8 +92,7 @@ int main(int argc, char* argv[]){
 
         rendering_draw_cursor(ui, cursor);
         if(cursor != 0 && distancec2d(worldspace_pos, player -> e.position) > player -> range * 16){
-            rendering_draw_text("Range!", g_video_mode.ui_scale, g_def_font, {000, 000, 000}, Coord2d{x + 6, y + 9});
-            rendering_draw_text("Range!", g_video_mode.ui_scale, g_def_font, {200, 050, 050}, Coord2d{x + 6, y + 8});
+            rendering_draw_text("Range!", g_video_mode.ui_scale, g_def_font, {172, 50, 50}, Coord2d{x + 6, y + 8});
         }
 
         //if(g_debug){
@@ -104,6 +108,7 @@ int main(int argc, char* argv[]){
 
         if(input_get_key_down(GLFW_KEY_F3)){
             g_debug = !g_debug;
+            std::cout << "f3 : " << g_debug << std::endl;
         }
 
         if(input_get_button_up(GLFW_MOUSE_BUTTON_1)) {
@@ -116,6 +121,7 @@ int main(int argc, char* argv[]){
 
         if(input_get_key_down(GLFW_KEY_ESCAPE)){
             g_time -> paused = !g_time -> paused;
+            std::cout << "esc : " << g_time -> paused << std::endl;
         }
 
         if(input_get_key_down(GLFW_KEY_Q))

@@ -44,6 +44,7 @@ void entity_tick_enemy(Entity* e){
         e1->e.velocity = {0,0};
 
         double targetDist = distancec2d(e1->target->position, e1->e.position);
+
         //Target is beyond follow distance
         if(targetDist > e1->follow_range) {
             e1->target = nullptr;
@@ -63,7 +64,6 @@ void entity_tick_enemy(Entity* e){
         e1 -> e.velocity = {e1 -> movementSpeed * cos(theta_radians), e1 -> movementSpeed * sin(theta_radians)};
 
     } else {
-
         for (int i = 0; i < g_entity_highest_id; i++) {
             //Skip self
             if (i == e1->e.id)
@@ -72,13 +72,36 @@ void entity_tick_enemy(Entity* e){
             if(g_entity_registry[i] == nullptr)
                 continue;
             //Found new target
-            if (g_entity_registry[i] -> type == ENT_PLAYER && distancec2d(g_entity_registry[i]->position, e1->e.position) <= e1->follow_range) {
+            int targettype = ENT_PLAYER;
+            if (g_entity_registry[i] -> type == targettype && distancec2d(g_entity_registry[i]->position, e1->e.position) <= e1->follow_range) {
                 e1->target = g_entity_registry[i];
                 break;
             }
         }
     }
 }
+
+void entity_tick_zombie(Entity* e){
+    entity_tick_enemy(e);
+
+    Entity_Enemy* e1 = (Entity_Enemy*)e;
+
+    if(e1 -> target == nullptr)
+        return;
+
+    double targetDist = distancec2d(e1->target->position, e1->e.position);
+
+    if(targetDist < e1 -> attack_range){
+        if(e1 -> attack_timer == nullptr || time_timer_finished(e1 -> attack_timer)) {
+            e1->attack_timer = time_timer_start(e1->attack_time);
+            Entity *hit = entity_hit((Entity *) e1, e1->e.velocity);
+            if (hit == e1 -> target) {
+                entity_damage(hit, e1->damage);
+            }
+        }
+    }
+}
+
 void entity_tick_skeleton(Entity* e){
     entity_tick_enemy(e);
 
@@ -109,15 +132,24 @@ void entity_tick_skeleton(Entity* e){
     Coord2d v = {cos(theta), sin(theta)};
 
     proj -> e.velocity = { proj -> movementSpeed * v.x, proj -> movementSpeed * v.y};
-    proj -> e.position = proj -> e.position + Coord2d{18 * v.x, 10 * v.y};
+    proj -> e.position = proj -> e.position + Coord2d{16 * v.x, 16 * v.y};
     proj -> lifetime_timer = time_timer_start(proj -> lifetime);
 }
+
 void entity_tick_bone(Entity* e){
     Entity_Bone* e1 = (Entity_Bone*)e;
 
     Entity* hit = entity_hit((Entity*)e1, ((Entity*)e1) -> velocity);
     if( hit != nullptr){
-        //entity_damage(hit, 1);
+        entity_damage(hit, 1);
+        entity_death_bone(e);
+    }
+
+    //Check for wall hits
+    Coord2d check_position = entity_collision(e, e->velocity);
+
+    //Bone hit a wall
+    if(check_position != e->velocity){
         entity_death_bone(e);
     }
 
@@ -137,15 +169,24 @@ void entity_death_skeleton(Entity* e){
     entity_delete(e -> id);
 }
 
+void entity_death_zombie(Entity* e){
+    entity_delete(e -> id);
+}
 void entity_death_bone(Entity* e){
-    e -> health = 0;
+    e -> health = -1;
     Entity_Bone* eb = (Entity_Bone*)e;
-    std::cout << e->id << std::endl;
+
+    //Use tick to "randomly" assign sprite
+    int atlas_index = (g_time -> tick % 2 == 0) ? 34 : 43;
     e -> velocity = {0, 0};
-    e -> atlas_index = 34;
-    e -> animation_rate = 64;
+    e -> atlas_index = atlas_index;
+    e -> col_bounds = { {0, 0}, {-1, -1} };
+    e -> hit_bounds = { {0, 0}, {-1, -1} };
+    e -> animation_rate = 9999;
+
     time_callback_start(16, [](void* v){
         Entity* e = (Entity*)v;
         entity_delete(e -> id);
     }, e);
+
 }

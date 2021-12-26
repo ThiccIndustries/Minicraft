@@ -205,7 +205,10 @@ Chunk* world_load_chunk(Coord2i coord){
 
 void world_unload_chunk(Chunk* chunk){
     world_chunkfile_write("saves/" + g_save -> world_name + "/chunks", chunk);
-    texture_destroy(chunk -> render_texture);
+    if(chunk -> render_texture != nullptr) {
+        texture_destroy(chunk->render_texture);
+    }
+
     delete[] chunk;
 }
 

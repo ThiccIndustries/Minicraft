@@ -22,11 +22,13 @@ void entity_tick_player(Entity* e);
 void entity_tick_enemy(Entity* e);
 void entity_tick_bone(Entity* e);
 void entity_tick_skeleton(Entity* e);
+void entity_tick_zombie(Entity* e);
 
 void entity_death_player(Entity* e);
 void entity_death_enemy(Entity* e);
 void entity_death_bone(Entity* e);
 void entity_death_skeleton(Entity* e);
+void entity_death_zombie(Entity* e);
 
 //Player
 typedef struct Entity_Player{
@@ -49,7 +51,7 @@ typedef struct Entity_Player{
         e.hit_bounds        = {{2, 0}, {14, 15}};
         e.animation_rate    = TIME_TPS;
         e.type              = ENT_PLAYER;
-        e.health            = 10;
+        e.health            = 1000;
 
         e.tick_func         = &entity_tick_player;
         e.death_func         = &entity_death_player;
@@ -78,6 +80,7 @@ typedef struct Entity_Enemy{
     double  movementSpeed;
     uint    attack_range;
     uint    follow_range;
+    uint    damage;
     double  attack_time;
     Timer*  attack_timer = nullptr;
     Entity* target = nullptr;
@@ -92,6 +95,8 @@ typedef struct Entity_Enemy{
         e.health  = 10;
         e.tick_func = &entity_tick_enemy;
         e.death_func = &entity_death_enemy;
+        damage = 2;
+        attack_time = TIME_TPS;
     }
 }Entity_Enemy;
 
@@ -102,6 +107,8 @@ typedef struct Entity_Zombie{
         e.e.atlas_index = 3;
         e.e.spritesheet_size  = {3, 3};
         e.e.type = ENT_ZOMBIE;
+        e.e.tick_func   = &entity_tick_zombie;
+        e.e.death_func   = &entity_death_zombie;
         e.movementSpeed = ((2.5 * 16) / TIME_TPS);
         e.e.health = 10;
         e.attack_range = 1 * 16;
@@ -146,6 +153,7 @@ typedef struct Entity_Bone{
         e.type = ENT_BONE;
         e.tick_func = &entity_tick_bone;
         e.death_func = &entity_death_bone;
+        e.health = 999;
 
         movementSpeed   = ((5.0 * 16) / TIME_TPS);
         lifetime        = 2 * TIME_TPS;
