@@ -149,7 +149,7 @@ typedef struct Entity_Bone{
         e.frame_order = new uint[]{0, 1};
         e.col_bounds  = {{2, 2}, {9, 9}};
         e.hit_bounds  = {{1, 1}, {10, 10}};
-        e.animation_rate = 16;
+        e.animation_rate = TIME_TPS / 4;
         e.type = ENT_BONE;
         e.tick_func = &entity_tick_bone;
         e.death_func = &entity_death_bone;

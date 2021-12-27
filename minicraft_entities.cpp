@@ -190,7 +190,7 @@ void entity_death_bone(Entity* e){
     e -> hit_bounds = {};
     e -> animation_rate = 9999;
 
-    time_callback_start(32, [](void* v){
+    time_callback_start(TIME_TPS / 2, [](void* v){
         Entity* e = (Entity*)v;
         g_penispenis = true;
         entity_delete(e -> id);

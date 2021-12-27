@@ -9,7 +9,7 @@
 
 Save* g_save = nullptr;
 std::string g_game_path;
-bool g_debug = false;
+bool g_debug = true;
 bool g_penispenis = false;
 void tick();
 Texture* terr;
@@ -36,7 +36,6 @@ int main(int argc, char* argv[]){
     Texture* ent  = texture_load_bmp(get_resource_path(g_game_path, "resources/entity.bmp"), TEXTURE_MULTIPLE, 16);
 
     player = (Entity_Player*) entity_create( (Entity*)new Entity_Player); //Entity 0
-
     player -> e.position = Coord2d{(double)g_save->player_position.x, (double)g_save->player_position.y};
 
     Entity_Skeleton* zambabe = (Entity_Skeleton*) entity_create( (Entity*)new Entity_Skeleton );
