@@ -109,7 +109,7 @@ typedef struct Entity_Zombie{
         e.e.type = ENT_ZOMBIE;
         e.e.tick_func   = &entity_tick_zombie;
         e.e.death_func   = &entity_death_zombie;
-        e.movementSpeed = ((2.5 * 16) / TIME_TPS);
+        e.movementSpeed = ((2.0 * 16) / TIME_TPS);
         e.e.health = 10;
         e.attack_range = 1 * 16;
         e.follow_range = 5 * 16;

@@ -10,7 +10,7 @@
 Save* g_save = nullptr;
 std::string g_game_path;
 bool g_debug = false;
-
+bool g_penispenis = false;
 void tick();
 Texture* terr;
 
@@ -59,6 +59,7 @@ int main(int argc, char* argv[]){
     uint fps = 0;
     float ftime = 0.0;
     Timer* t = time_timer_start(TIME_TPS / 2);
+    Timer* autosave_timer = time_timer_start(TIME_TPS * 5);
 
     while(!glfwWindowShouldClose(windowptr)){
         input_poll_input();
@@ -95,12 +96,16 @@ int main(int argc, char* argv[]){
             rendering_draw_text("Range!", g_video_mode.ui_scale, g_def_font, {172, 50, 50}, Coord2d{x + 6, y + 8});
         }
 
-        //if(g_debug){
-            if(time_timer_finished(t)){
-                t = time_timer_start(TIME_TPS / 4);
-                fps = clampi(time_get_framerate(), 0, 99999);
-                ftime = g_time -> delta;
-            }
+        if(time_timer_finished(t)){
+            t = time_timer_start(TIME_TPS / 4);
+            fps = clampi(time_get_framerate(), 0, 99999);
+            ftime = g_time -> delta;
+        }
+
+        if(time_timer_finished(autosave_timer)){
+            world_save_game(g_save);
+            autosave_timer = time_timer_start(TIME_TPS * 5);
+        }
 
         rendering_draw_text("Fps:" + std::to_string(fps), g_video_mode.ui_scale, font, {255, 255, 255}, {g_video_mode.window_resolution.x - (double)(font -> t -> tile_size * 10 * g_video_mode.ui_scale), 0} );
         rendering_draw_text(" us:" + std::to_string(ftime * 1000.0f), g_video_mode.ui_scale, font, {255, 255, 255}, {g_video_mode.window_resolution.x - (double)(font -> t -> tile_size * 10 * g_video_mode.ui_scale), 8} );

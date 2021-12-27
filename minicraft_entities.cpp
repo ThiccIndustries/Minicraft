@@ -143,6 +143,7 @@ void entity_tick_bone(Entity* e){
     if( hit != nullptr){
         entity_damage(hit, 1);
         entity_death_bone(e);
+        return;
     }
 
     //Check for wall hits
@@ -151,8 +152,13 @@ void entity_tick_bone(Entity* e){
     //Bone hit a wall
     if(check_position != e->velocity){
         entity_death_bone(e);
+        return;
     }
 
+    if(time_timer_finished( e1 -> lifetime_timer )) {
+        entity_death_bone(e);
+        return; //TODO: Redundant? I guess if I ever add a new condition it would prevent a crash in case i forget.
+    }
 }
 
 void entity_death_player(Entity* e){
@@ -180,12 +186,13 @@ void entity_death_bone(Entity* e){
     int atlas_index = (g_time -> tick % 2 == 0) ? 34 : 43;
     e -> velocity = {0, 0};
     e -> atlas_index = atlas_index;
-    e -> col_bounds = { {0, 0}, {-1, -1} };
-    e -> hit_bounds = { {0, 0}, {-1, -1} };
+    e -> col_bounds = {};
+    e -> hit_bounds = {};
     e -> animation_rate = 9999;
 
-    time_callback_start(16, [](void* v){
+    time_callback_start(32, [](void* v){
         Entity* e = (Entity*)v;
+        g_penispenis = true;
         entity_delete(e -> id);
     }, e);
 
