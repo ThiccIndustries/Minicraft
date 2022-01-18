@@ -125,6 +125,29 @@ int main(int argc, char* argv[]){
         double dy = speed * ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0));
         player -> e.velocity = {dx, dy};
 
+        if(input_get_key_down(GLFW_KEY_F3)){
+            g_debug = !g_debug;
+            std::cout << "f3 : " << g_debug << std::endl;
+        }
+
+        if(input_get_button_up(GLFW_MOUSE_BUTTON_1)) {
+            time_timer_cancel(player -> collect_timer);
+        }
+
+        if(input_get_button_down(GLFW_MOUSE_BUTTON_1)){
+            player -> collect_timer = time_timer_start(player -> collect_delay);
+        }
+
+        if(input_get_key_down(GLFW_KEY_ESCAPE)){
+            g_time -> paused = !g_time -> paused;
+            std::cout << "esc : " << g_time -> paused << std::endl;
+        }
+
+        if(input_get_key_down(GLFW_KEY_Q))
+            player -> tmp_debug = clampi(player -> tmp_debug - 1, 21, 24);
+
+        if(input_get_key_down(GLFW_KEY_E))
+            player -> tmp_debug = clampi(player -> tmp_debug + 1, 21, 24);
 
 
         for(int i = 0; i <=  g_dynamic_panel_highest_id; ++i){
@@ -146,30 +169,6 @@ int main(int argc, char* argv[]){
 }
 
 void tick(){
-    if(input_get_key_down(GLFW_KEY_F3)){
-        g_debug = !g_debug;
-        std::cout << "f3 : " << g_debug << std::endl;
-    }
-
-    if(input_get_button_up(GLFW_MOUSE_BUTTON_1)) {
-        time_timer_cancel(player -> collect_timer);
-    }
-
-    if(input_get_button_down(GLFW_MOUSE_BUTTON_1)){
-        player -> collect_timer = time_timer_start(player -> collect_delay);
-    }
-
-    if(input_get_key_down(GLFW_KEY_ESCAPE)){
-        g_time -> paused = !g_time -> paused;
-        std::cout << "esc : " << g_time -> paused << std::endl;
-    }
-
-    if(input_get_key_down(GLFW_KEY_Q))
-        player -> tmp_debug = clampi(player -> tmp_debug - 1, 21, 24);
-
-    if(input_get_key_down(GLFW_KEY_E))
-        player -> tmp_debug = clampi(player -> tmp_debug + 1, 21, 24);
-
     entity_tick();
     ui_tick();
     g_save -> player_position = Coord2i{(int)player -> e.position.x , (int)player -> e.position.y};
