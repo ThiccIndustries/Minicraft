@@ -10,8 +10,9 @@
 Save* g_save = nullptr;
 std::string g_game_path;
 bool g_debug = true;
-bool g_penispenis = false;
+
 void tick();
+
 Texture* terr;
 
 Texture* texture_callback(Chunk* c);
@@ -60,6 +61,16 @@ int main(int argc, char* argv[]){
     Timer* t = time_timer_start(TIME_TPS / 2);
     Timer* autosave_timer = time_timer_start(TIME_TPS * 5);
 
+    //Create health and stamina bars
+    Panel* health_bar = ui_create_health_bar(ui, 8, 9, 10, &(player -> e.health));
+    Panel* stamina_bar = ui_create_health_bar(ui, 16, 17, 10, &(player -> stamina));
+
+    health_bar -> position = {2, 2};
+    stamina_bar -> position = {2, 10};
+
+    ui_dynamic_panel_activate(health_bar);
+    ui_dynamic_panel_activate(stamina_bar);
+    
     while(!glfwWindowShouldClose(windowptr)){
         input_poll_input();
         time_update_time(glfwGetTime());
@@ -70,8 +81,6 @@ int main(int argc, char* argv[]){
         rendering_draw_chunk_buffer((Entity*)player);
 
         rendering_draw_entities(ent,       (Entity*)player);
-        rendering_draw_bar(player -> e.health,  {0, 0}, ui, 8);
-        rendering_draw_bar(player -> stamina,   {0, (int)ui -> tile_size}, ui, 16);
 
         uint cursor = 0;
         double x, y;
@@ -87,8 +96,9 @@ int main(int argc, char* argv[]){
         Coord2i tile{(int) (worldspace_pos.x - (chunk.x * 256)) / 16,
                      (int) (worldspace_pos.y - (chunk.y * 256)) / 16};
 
-        if(world_get_chunk(chunk) != nullptr && g_block_registry[world_get_chunk(chunk)->overlay_tiles[tile.x + (tile.y * 16)]]->options & TILE_COLLECTABLE)
+        if(world_get_chunk(chunk) != nullptr && g_block_registry[world_get_chunk(chunk)->overlay_tiles[tile.x + (tile.y * 16)]]->options & TILE_COLLECTABLE){
             cursor = 1;
+        }
 
         rendering_draw_cursor(ui, cursor);
         if(cursor != 0 && distancec2d(worldspace_pos, player -> e.position) > player -> range * 16){
@@ -108,38 +118,21 @@ int main(int argc, char* argv[]){
 
         rendering_draw_text("Fps:" + std::to_string(fps), g_video_mode.ui_scale, font, {255, 255, 255}, {g_video_mode.window_resolution.x - (double)(font -> t -> tile_size * 10 * g_video_mode.ui_scale), 0} );
         rendering_draw_text(" us:" + std::to_string(ftime * 1000.0f), g_video_mode.ui_scale, font, {255, 255, 255}, {g_video_mode.window_resolution.x - (double)(font -> t -> tile_size * 10 * g_video_mode.ui_scale), 8} );
-        //}
-
-        if(input_get_key_down(GLFW_KEY_F3)){
-            g_debug = !g_debug;
-            std::cout << "f3 : " << g_debug << std::endl;
-        }
-
-        if(input_get_button_up(GLFW_MOUSE_BUTTON_1)) {
-            time_timer_cancel(player -> collect_timer);
-        }
-
-        if(input_get_button_down(GLFW_MOUSE_BUTTON_1)){
-            player -> collect_timer = time_timer_start(player -> collect_delay);
-        }
-
-        if(input_get_key_down(GLFW_KEY_ESCAPE)){
-            g_time -> paused = !g_time -> paused;
-            std::cout << "esc : " << g_time -> paused << std::endl;
-        }
-
-        if(input_get_key_down(GLFW_KEY_Q))
-            player -> tmp_debug = clampi(player -> tmp_debug - 1, 21, 24);
-
-        if(input_get_key_down(GLFW_KEY_E))
-            player -> tmp_debug = clampi(player -> tmp_debug + 1, 21, 24);
 
 
         double speed = (input_get_key(GLFW_KEY_LEFT_SHIFT) && player -> stamina != 0) ? player -> run_speed : player -> walk_speed;
-
         double dx = speed * ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0));
         double dy = speed * ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0));
         player -> e.velocity = {dx, dy};
+
+
+
+        for(int i = 0; i <=  g_dynamic_panel_highest_id; ++i){
+            if(g_dynamic_panel_registry[i] == nullptr)
+                continue;
+
+            rendering_draw_panel(g_dynamic_panel_registry[i]);
+        }
 
         glfwSwapBuffers(windowptr);
     }
@@ -153,12 +146,38 @@ int main(int argc, char* argv[]){
 }
 
 void tick(){
+    if(input_get_key_down(GLFW_KEY_F3)){
+        g_debug = !g_debug;
+        std::cout << "f3 : " << g_debug << std::endl;
+    }
+
+    if(input_get_button_up(GLFW_MOUSE_BUTTON_1)) {
+        time_timer_cancel(player -> collect_timer);
+    }
+
+    if(input_get_button_down(GLFW_MOUSE_BUTTON_1)){
+        player -> collect_timer = time_timer_start(player -> collect_delay);
+    }
+
+    if(input_get_key_down(GLFW_KEY_ESCAPE)){
+        g_time -> paused = !g_time -> paused;
+        std::cout << "esc : " << g_time -> paused << std::endl;
+    }
+
+    if(input_get_key_down(GLFW_KEY_Q))
+        player -> tmp_debug = clampi(player -> tmp_debug - 1, 21, 24);
+
+    if(input_get_key_down(GLFW_KEY_E))
+        player -> tmp_debug = clampi(player -> tmp_debug + 1, 21, 24);
+
     entity_tick();
+    ui_tick();
     g_save -> player_position = Coord2i{(int)player -> e.position.x , (int)player -> e.position.y};
 }
 
 Texture* texture_callback(Chunk* c){
     return terr;
 }
+
 
 

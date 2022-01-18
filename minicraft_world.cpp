@@ -51,45 +51,47 @@ Block* g_block_registry[255] = {
                   Texture   Options                         DropID  DropCount */
 
         //Background Tiles
-        new Block{0,        0,                              0,      0}, //Grass
-        new Block{1,        TILE_SOLID,                     0,      0}, //Tree_Base
-        new Block{2,        TILE_SOLID,                     0,      0}, //Tree_Top
+        new Block{0,        0,                                  0,      0}, //Grass
+        new Block{1,        TILE_SOLID,                         0,      0}, //Tree_Base
+        new Block{2,        TILE_SOLID,                         0,      0}, //Tree_Top
 
-        new Block{6,        TILE_SOLID,                     0,      0}, //Water
+        new Block{6,        TILE_SOLID,                         0,      0}, //Water
 
-        new Block{3,        TILE_SOLID,                     0,      0}, //Water_Corner_UL
-        new Block{3,        TILE_SOLID | TILE_TEX_FLIP_X,   0,      0}, //Water_Corner_UR
+        new Block{3,        TILE_SOLID,                         0,      0}, //Water_Corner_UL
+        new Block{3,        TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_Corner_UR
 
-        new Block{4,        TILE_SOLID,                     0,      0}, //Water_Top
+        new Block{4,        TILE_SOLID,                         0,      0}, //Water_Top
 
-        new Block{5,        TILE_SOLID,                     0,      0}, //Water_ICorner_UL
-        new Block{5,        TILE_SOLID | TILE_TEX_FLIP_X,   0,      0}, //Water_ICorner_UR
+        new Block{5,        TILE_SOLID,                         0,      0}, //Water_ICorner_UL
+        new Block{5,        TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_ICorner_UR
 
-        new Block{11,       TILE_SOLID,                     0,     0}, //Water_Side_L
-        new Block{11,       TILE_SOLID | TILE_TEX_FLIP_X,   0,     0}, //Water_Side_R
+        new Block{11,       TILE_SOLID,                         0,     0}, //Water_Side_L
+        new Block{11,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_Side_R
 
-        new Block{19,       TILE_SOLID,                     0,     0}, //Water_Corner_DL
-        new Block{19,       TILE_SOLID | TILE_TEX_FLIP_X,   0,     0}, //Water_Corner_DR
+        new Block{19,       TILE_SOLID,                         0,     0}, //Water_Corner_DL
+        new Block{19,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_Corner_DR
 
-        new Block{12,       TILE_SOLID,                     0,     0}, //Water_Bottom
+        new Block{12,       TILE_SOLID,                         0,     0}, //Water_Bottom
 
-        new Block{13,       TILE_SOLID,                     0,     0}, //Water_ICorner_DL
-        new Block{13,       TILE_SOLID | TILE_TEX_FLIP_X,   0,     0}, //Water_ICorner_DR
+        new Block{13,       TILE_SOLID,                         0,     0}, //Water_ICorner_DL
+        new Block{13,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_ICorner_DR
 
-        new Block{14,       TILE_SOLID,                     0,      0}, //Water_U_Top
-        new Block{15,       TILE_SOLID,                     0,      0}, //Water_U_Bottom
-        new Block{20,       TILE_SOLID,                     0,      0}, //Water_U_L
-        new Block{20,       TILE_SOLID | TILE_TEX_FLIP_X,   0,      0}, //Water_U_R
+        new Block{14,       TILE_SOLID,                         0,      0}, //Water_U_Top
+        new Block{15,       TILE_SOLID,                         0,      0}, //Water_U_Bottom
+        new Block{20,       TILE_SOLID,                         0,      0}, //Water_U_L
+        new Block{20,       TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_U_R
 
-        new Block{22,       TILE_SOLID,                     0,      0}, //Water_U_Corner_Top
-        new Block{7,        TILE_SOLID,                     0,      0}, //Water_U_Corner_Bottom
-        new Block{21,       TILE_SOLID,                     0,      0}, //Water_U_Corner_L
-        new Block{21,       TILE_SOLID | TILE_TEX_FLIP_X,   0,      0}, //Water_U_Corner_R
+        new Block{22,       TILE_SOLID,                         0,      0}, //Water_U_Corner_Top
+        new Block{7,        TILE_SOLID,                         0,      0}, //Water_U_Corner_Bottom
+        new Block{21,       TILE_SOLID,                         0,      0}, //Water_U_Corner_L
+        new Block{21,       TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_U_Corner_R
 
         //Collectables
-        new Block{8,        TILE_COLLECTABLE,               1,      1}, //Flower
-        new Block{9,        TILE_COLLECTABLE,               2,      1}, //Lily
-        new Block{10,       TILE_SOLID | TILE_COLLECTABLE,  3,      1}, //Wood
+        new Block{8,        TILE_COLLECTABLE,                   1,      1}, //Flower
+        new Block{9,        TILE_COLLECTABLE,                   2,      1}, //Lily
+        new Block{10,       TILE_SOLID | TILE_COLLECTABLE,      3,      1}, //Wood
+        new Block{16,       TILE_COLLECTABLE | TILE_ANIMATED,   4,      1}, //Dead_Zombie
+        new Block{17,       TILE_COLLECTABLE,                   5,      1}, //Bone fragments
 };
 
 
@@ -119,7 +121,7 @@ Chunk* world_load_chunk(Coord2i coord){
                 tile = WATER;
 
 
-            //TODO: Yanderedev-ass code holy shit
+            //TODO: This is the worst thing ever wow.
             //Pass 1
             if (tile == WATER && !water[1])
                 tile = WATER_TOP;
@@ -205,8 +207,12 @@ Chunk* world_load_chunk(Coord2i coord){
 
 void world_unload_chunk(Chunk* chunk){
     world_chunkfile_write("saves/" + g_save -> world_name + "/chunks", chunk);
-    if(chunk -> render_texture != nullptr) {
-        texture_destroy(chunk->render_texture);
+
+    for(int i = 0; i < 2; i++){
+        if(chunk -> render_texture[i] != nullptr) {
+            texture_destroy(chunk->render_texture[i]);
+            chunk -> render_texture[i] == nullptr;
+        }
     }
 
     delete[] chunk;

@@ -46,7 +46,7 @@ void entity_tick_enemy(Entity* e){
         double targetDist = distancec2d(e1->target->position, e1->e.position);
 
         //Target is beyond follow distance
-        if(targetDist > e1->follow_range) {
+        if(targetDist > e1->follow_range || e1 -> target->health <= 0) {
             e1->target = nullptr;
             return; //Wait next tick
         }
@@ -73,7 +73,7 @@ void entity_tick_enemy(Entity* e){
                 continue;
             //Found new target
             int targettype = ENT_PLAYER;
-            if (g_entity_registry[i] -> type == targettype && distancec2d(g_entity_registry[i]->position, e1->e.position) <= e1->follow_range) {
+            if (g_entity_registry[i] -> type == targettype && distancec2d(g_entity_registry[i]->position, e1->e.position) <= e1->follow_range && g_entity_registry[i] -> health > 0) {
                 e1->target = g_entity_registry[i];
                 break;
             }
@@ -162,9 +162,24 @@ void entity_tick_bone(Entity* e){
 }
 
 void entity_death_player(Entity* e){
-    error("Game Over.", "Player died on tick: " + std::to_string(g_time -> tick));
-    entity_delete(e -> id);
-    g_time -> paused = true;
+    Entity_Player* player = (Entity_Player*)e;
+    e -> health = -1;
+
+    int atlas_index = e -> atlas_index + 27;
+    e -> velocity = {0, 0};
+    e -> atlas_index = atlas_index;
+    e -> col_bounds = {};
+    e -> hit_bounds = {};
+    e -> animation_rate = 9999;
+    player -> run_speed = 0;
+    player -> walk_speed = 0;
+    
+    time_callback_start(TIME_TPS * 5, [](void* v){
+        Entity* e = (Entity*)v;
+        error("Game Over.", "Player died on tick: " + std::to_string(g_time -> tick));
+        entity_delete(e -> id);
+        g_time -> paused = true;
+    }, e);
 }
 
 void entity_death_enemy(Entity* e){
@@ -172,18 +187,48 @@ void entity_death_enemy(Entity* e){
 }
 
 void entity_death_skeleton(Entity* e){
-    entity_delete(e -> id);
+    Coord2d pos = e -> position;
+    Coord2i chunk{  (int) floor(pos.x / 256.0),
+                    (int) floor(pos.y / 256.0)};
+    Coord2i tile{(int) (pos.x - (chunk.x * 256)) / 16,
+                 (int) (pos.y - (chunk.y * 256)) / 16};
+
+    Chunk* chunkptr = world_get_chunk(chunk);
+    
+    //Entity did not die offscreen
+    if(chunkptr != nullptr){
+        chunkptr -> overlay_tiles[ (tile.y * 16) + tile.x ] = 27;
+        world_chunk_refresh_metatextures(chunkptr);
+    }
+
+    entity_death_enemy(e);
 }
 
 void entity_death_zombie(Entity* e){
-    entity_delete(e -> id);
+    Coord2d pos = e -> position;
+    Coord2i chunk{  (int) floor(pos.x / 256.0),
+                    (int) floor(pos.y / 256.0)};
+    Coord2i tile{(int) (pos.x - (chunk.x * 256)) / 16,
+                 (int) (pos.y - (chunk.y * 256)) / 16};
+
+    Chunk* chunkptr = world_get_chunk(chunk);
+    
+    //Entity did not die offscreen
+    if(chunkptr != nullptr){
+        chunkptr -> overlay_tiles[ (tile.y * 16) + tile.x ] = 27;
+        world_chunk_refresh_metatextures(chunkptr);
+    }
+
+
+    entity_death_enemy(e);
 }
+
 void entity_death_bone(Entity* e){
     e -> health = -1;
     Entity_Bone* eb = (Entity_Bone*)e;
 
     //Use tick to "randomly" assign sprite
-    int atlas_index = (g_time -> tick % 2 == 0) ? 34 : 43;
+    int atlas_index = (g_time -> tick % 2 == 0) ? 37 : 46;
     e -> velocity = {0, 0};
     e -> atlas_index = atlas_index;
     e -> col_bounds = {};
@@ -192,7 +237,6 @@ void entity_death_bone(Entity* e){
 
     time_callback_start(TIME_TPS / 2, [](void* v){
         Entity* e = (Entity*)v;
-        g_penispenis = true;
         entity_delete(e -> id);
     }, e);
 

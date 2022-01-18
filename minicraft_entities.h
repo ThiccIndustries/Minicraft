@@ -36,7 +36,7 @@ typedef struct Entity_Player{
 
     double  walk_speed, run_speed;
     uint    range;
-    uint    stamina;
+    int    stamina;
 
     uint    tmp_debug;
     uint    stamina_delay,  collect_delay,  attack_delay;
@@ -51,7 +51,7 @@ typedef struct Entity_Player{
         e.hit_bounds        = {{2, 0}, {14, 15}};
         e.animation_rate    = TIME_TPS;
         e.type              = ENT_PLAYER;
-        e.health            = 1000;
+        e.health            = 10;
 
         e.tick_func         = &entity_tick_player;
         e.death_func         = &entity_death_player;
@@ -110,7 +110,7 @@ typedef struct Entity_Zombie{
         e.e.tick_func   = &entity_tick_zombie;
         e.e.death_func   = &entity_death_zombie;
         e.movementSpeed = ((2.0 * 16) / TIME_TPS);
-        e.e.health = 10;
+        e.e.health = 1;
         e.attack_range = 1 * 16;
         e.follow_range = 5 * 16;
         e.attack_time = 32;
@@ -143,7 +143,7 @@ typedef struct Entity_Bone{
     Entity* target;
 
     Entity_Bone() {
-        e.atlas_index = 33;
+        e.atlas_index = 36;
         e.spritesheet_size = {1, 2};
         e.frame_count = 2;
         e.frame_order = new uint[]{0, 1};

@@ -12,7 +12,7 @@
 #include "geode.h"
 #include "iostream"
 
-#define TILE_COLLECTABLE 0b00001000
+#define TILE_COLLECTABLE TILE_LAST << 1
 
 //Entities
 #include "minicraft_entities.h"
@@ -42,4 +42,6 @@ Chunk*  world_load_chunk(Coord2i coord);
 void    world_unload_chunk(Chunk* chunk);
 Save*   world_load_game(const std::string& world_name);
 void    world_save_game(Save* save);
+
+
 #endif
