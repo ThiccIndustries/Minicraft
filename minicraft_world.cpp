@@ -46,66 +46,65 @@ enum{
     WOOD
 };
 
-Block* g_block_registry[255] = {
+    Block* tile_properties = new Block[]{
         /*        Tile Definitions
                   Texture   Options                         DropID  DropCount */
 
         //Background Tiles
-        new Block{0,        0,                                  0,      0}, //Grass
-        new Block{1,        TILE_SOLID,                         0,      0}, //Tree_Base
-        new Block{2,        TILE_SOLID,                         0,      0}, //Tree_Top
+        {0,        0,                                  0,      0}, //Grass
+        {1,        TILE_SOLID,                         0,      0}, //Tree_Base
+        {2,        TILE_SOLID,                         0,      0}, //Tree_Top
 
-        new Block{6,        TILE_SOLID,                         0,      0}, //Water
+        {6,        TILE_SOLID,                         0,      0}, //Water
 
-        new Block{3,        TILE_SOLID,                         0,      0}, //Water_Corner_UL
-        new Block{3,        TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_Corner_UR
+        {3,        TILE_SOLID,                         0,      0}, //Water_Corner_UL
+        {3,        TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_Corner_UR
 
-        new Block{4,        TILE_SOLID,                         0,      0}, //Water_Top
+        {4,        TILE_SOLID,                         0,      0}, //Water_Top
 
-        new Block{5,        TILE_SOLID,                         0,      0}, //Water_ICorner_UL
-        new Block{5,        TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_ICorner_UR
+        {5,        TILE_SOLID,                         0,      0}, //Water_ICorner_UL
+        {5,        TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_ICorner_UR
 
-        new Block{11,       TILE_SOLID,                         0,     0}, //Water_Side_L
-        new Block{11,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_Side_R
+        {11,       TILE_SOLID,                         0,     0}, //Water_Side_L
+        {11,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_Side_R
 
-        new Block{19,       TILE_SOLID,                         0,     0}, //Water_Corner_DL
-        new Block{19,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_Corner_DR
+        {19,       TILE_SOLID,                         0,     0}, //Water_Corner_DL
+        {19,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_Corner_DR
 
-        new Block{12,       TILE_SOLID,                         0,     0}, //Water_Bottom
+        {12,       TILE_SOLID,                         0,     0}, //Water_Bottom
 
-        new Block{13,       TILE_SOLID,                         0,     0}, //Water_ICorner_DL
-        new Block{13,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_ICorner_DR
+        {13,       TILE_SOLID,                         0,     0}, //Water_ICorner_DL
+        {13,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_ICorner_DR
 
-        new Block{14,       TILE_SOLID,                         0,      0}, //Water_U_Top
-        new Block{15,       TILE_SOLID,                         0,      0}, //Water_U_Bottom
-        new Block{20,       TILE_SOLID,                         0,      0}, //Water_U_L
-        new Block{20,       TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_U_R
+        {14,       TILE_SOLID,                         0,      0}, //Water_U_Top
+        {15,       TILE_SOLID,                         0,      0}, //Water_U_Bottom
+        {20,       TILE_SOLID,                         0,      0}, //Water_U_L
+        {20,       TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_U_R
 
-        new Block{22,       TILE_SOLID,                         0,      0}, //Water_U_Corner_Top
-        new Block{7,        TILE_SOLID,                         0,      0}, //Water_U_Corner_Bottom
-        new Block{21,       TILE_SOLID,                         0,      0}, //Water_U_Corner_L
-        new Block{21,       TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_U_Corner_R
+        {22,       TILE_SOLID,                         0,      0}, //Water_U_Corner_Top
+        {7,        TILE_SOLID,                         0,      0}, //Water_U_Corner_Bottom
+        {21,       TILE_SOLID,                         0,      0}, //Water_U_Corner_L
+        {21,       TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_U_Corner_R
 
         //Collectables
-        new Block{8,        TILE_COLLECTABLE,                   1,      1}, //Flower
-        new Block{9,        TILE_COLLECTABLE,                   2,      1}, //Lily
-        new Block{10,       TILE_SOLID | TILE_COLLECTABLE,      3,      1}, //Wood
-        new Block{16,       TILE_COLLECTABLE | TILE_ANIMATED,   4,      1}, //Dead_Zombie
-        new Block{17,       TILE_COLLECTABLE,                   5,      1}, //Bone fragments
+        {8,        TILE_COLLECTABLE,                   1,      1}, //Flower
+        {9,        TILE_COLLECTABLE,                   2,      1}, //Lily
+        {10,       TILE_SOLID | TILE_COLLECTABLE,      3,      1}, //Wood
+        {16,       TILE_COLLECTABLE | TILE_ANIMATED,   4,      1}, //Dead_Zombie
+        {17,       TILE_COLLECTABLE,                   5,      1}, //Bone fragments
 };
 
 
-Chunk* world_load_chunk(Coord2i coord){
-    Chunk* chunkptr = world_chunkfile_read("saves/" + g_save -> world_name + "/chunks", coord );
+Chunk* world_load_chunk(Map* map, Coord2i coord){
+    Chunk* chunkptr = world_chunkfile_read(map, coord );
 
     //Chunk successfully loaded from file
     if(chunkptr != nullptr) return chunkptr;
 
     chunkptr = new Chunk;
-
     //Generate chunk
     siv::PerlinNoise noise;
-    noise.reseed(g_save -> seed);
+    noise.reseed(g_save -> s.seed);
     for (int tx = 0; tx < 16; ++tx) {
         for (int ty = 0; ty < 16; ++ty) {
             bool water[9] = {false};
@@ -115,7 +114,7 @@ Chunk* world_load_chunk(Coord2i coord){
                     water[((wy + 1) * 3) + (wx + 1)] = noise.noise2D((float) coord.x + ((float) (tx + wx) / 16), (float) coord.y + ((float) (ty + wy) / 16)) >= 0.1;
                 }
             }
-            uint tile = 0;
+            uint tile = GRASS;
 
             if (water[4])
                 tile = WATER;
@@ -200,61 +199,47 @@ Chunk* world_load_chunk(Coord2i coord){
 
 
     chunkptr -> pos = coord;
-    world_chunkfile_write("saves/" + g_save -> world_name + "/chunks", chunkptr);
+    world_chunkfile_write(map, chunkptr);
 
     return chunkptr;
 }
 
-void world_unload_chunk(Chunk* chunk){
-    world_chunkfile_write("saves/" + g_save -> world_name + "/chunks", chunk);
-
-    for(int i = 0; i < 2; i++){
-        if(chunk -> render_texture[i] != nullptr) {
-            texture_destroy(chunk->render_texture[i]);
-            chunk -> render_texture[i] == nullptr;
-        }
-    }
-
-    delete[] chunk;
+void world_unload_chunk(Map* map, Chunk* chunk){
+    world_chunkfile_write(map, chunk);
 }
 
 void  world_save_game(Save* save){
-    int px = save -> player_position.x;
-    int py = save -> player_position.y;
-
-    std::string path = "saves/" + save -> world_name;
-
-    std::filesystem::create_directories(get_resource_path(g_game_path, path));
-    FILE* savefile = fopen(get_resource_path(g_game_path, path + "/meta.sf").c_str(), "wb");
-
-    fwrite(&px, sizeof(int), 1, savefile);
-    fwrite(&py, sizeof(int), 1, savefile);
-
-    fseek(savefile, 0x10, SEEK_SET);
-    fwrite(&save -> seed, sizeof(long), 1, savefile);
-
-    fclose(savefile);
+    write_map_resource(save -> overworld, "save.dat", &(save -> s), sizeof(Save_Data));
 }
 
 
-Save* world_load_game(const std::string& world_name){
+Save* world_load_game(uint id){
     Save* save = new Save;
-    FILE* savefile = fopen(get_resource_path(g_game_path, "saves/" + world_name + "/meta.sf").c_str(), "rb");
-    save -> world_name = world_name;
-    //No save found
-    if(!savefile){
-        save -> player_position = {0,0};
-        save -> seed = std::time(0);
-        world_save_game(save);
-        return save;
+    Map* map = world_map_read(id);
+
+    if(map == nullptr){
+        Texture* terr = texture_load_bmp(get_resource_path(g_game_path, "resources/terrain.bmp"), TEXTURE_MULTIPLE | TEXTURE_STORE, 16);
+
+        Map* map1 = new Map;
+        map1 -> id = id;
+        map1 -> tilemap = terr;
+        map1 -> tile_count = 29;
+        std::cout << sizeof(*tile_properties) << " : " << sizeof(Block) << std::endl;
+        map1 -> tile_properties = tile_properties;
+        world_map_write(map1);
+
+        //Copy resources
+        std::filesystem::copy_file(get_resource_path(g_game_path, "resources/terrain.bmp").c_str(), get_resource_path(g_game_path, "maps/" + std::to_string(map1 -> id) + ".map/texture.bmp").c_str());
+        map = map1;
     }
 
-    fread(&save -> player_position.x, sizeof(int), 1, savefile);
-    fread(&save -> player_position.y, sizeof(int), 1, savefile);
+    Save_Data s;
+    s.player_position = {0, 0};
+    s.seed = std::time(0);
 
-    fseek(savefile, 0x10, SEEK_SET);
-    fread(&save -> seed, 1, sizeof(long), savefile);
+    read_map_resource(map, "save.dat", &s, sizeof(Save_Data));
 
-    fclose(savefile);
+    save -> s = s;
+    save -> overworld = map;
     return save;
 }

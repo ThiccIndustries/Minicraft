@@ -6,6 +6,7 @@
 
 #include "minicraft.h"
 #include <cmath>
+#include <filesystem>
 
 Save* g_save = nullptr;
 std::string g_game_path;
@@ -13,17 +14,14 @@ bool g_debug = true;
 
 void tick();
 
-Texture* terr;
-
-Texture* texture_callback(Chunk* c);
-
 Entity_Player *player = nullptr;
 
 int main(int argc, char* argv[]){
     g_game_path = argv[0];
-    g_save = world_load_game("test");
 
-    GLFWwindow* windowptr = rendering_init_opengl(320, 240, 1, 1, 1);
+    g_save = world_load_game(0);
+
+    GLFWwindow* windowptr = rendering_init_opengl(320, 240, 1, 1, 1, "Minicraft");
 
     //Load textures
     Font* font = new Font{
@@ -32,18 +30,21 @@ int main(int argc, char* argv[]){
     };
     g_def_font = font;
 
-    terr = texture_load_bmp(get_resource_path(g_game_path, "resources/terrain.bmp"), TEXTURE_MULTIPLE | TEXTURE_STORE, 16);
     Texture* ui   = texture_load_bmp(get_resource_path(g_game_path, "resources/ui.bmp"), TEXTURE_MULTIPLE, 8);
     Texture* ent  = texture_load_bmp(get_resource_path(g_game_path, "resources/entity.bmp"), TEXTURE_MULTIPLE, 16);
 
     player = (Entity_Player*) entity_create( (Entity*)new Entity_Player); //Entity 0
-    player -> e.transform.position = Coord2d{(double)g_save->player_position.x, (double)g_save->player_position.y};
+    player -> e.position = Coord2d{(double)g_save->s.player_position.x, (double)g_save->s.player_position.y};
+    player -> e.map = g_save -> overworld;
 
     Entity_Skeleton* zambabe = (Entity_Skeleton*) entity_create( (Entity*)new Entity_Skeleton );
-    zambabe -> e.e.transform.position = Coord2d{(double)g_save->player_position.x - 64, (double)g_save->player_position.y};
+    zambabe -> e.e.position = Coord2d{(double)g_save->s.player_position.x - 64, (double)g_save->s.player_position.y};
+    zambabe -> e.e.map = g_save -> overworld;
 
     Entity_Zombie* zambabe2 = (Entity_Zombie*) entity_create( (Entity*)new Entity_Zombie );
-    zambabe2 -> e.e.transform.position = Coord2d{(double)g_save->player_position.x + 16, (double)g_save->player_position.y};
+    zambabe2 -> e.e.position = Coord2d{(double)g_save->s.player_position.x + 16, (double)g_save->s.player_position.y};
+    zambabe2 -> e.e.map = g_save -> overworld;
+
     //Disable Vsync
     glfwSwapInterval(0);
 
@@ -52,9 +53,7 @@ int main(int argc, char* argv[]){
     time_set_tick_callback(&tick);
     world_set_chunk_callbacks(
             &world_load_chunk,
-            &world_unload_chunk,
-            &texture_callback
-            );
+            &world_unload_chunk);
 
     uint fps = 0;
     float ftime = 0.0;
@@ -103,12 +102,12 @@ int main(int argc, char* argv[]){
         Coord2i tile{(int) (worldspace_pos.x - (chunk.x * 256)) / 16,
                      (int) (worldspace_pos.y - (chunk.y * 256)) / 16};
 
-        if(world_get_chunk(chunk) != nullptr && g_block_registry[world_get_chunk(chunk)->overlay_tiles[tile.x + (tile.y * 16)]]->options & TILE_COLLECTABLE){
+        if(world_get_chunk(chunk) != nullptr && player -> e.map->tile_properties[world_get_chunk(chunk)->overlay_tiles[tile.x + (tile.y * 16)]].options & TILE_COLLECTABLE){
             cursor = 1;
         }
 
         rendering_draw_cursor(ui, cursor);
-        if(cursor != 0 && distancec2d(worldspace_pos, player -> e.transform.position) > player -> range * 16){
+        if(cursor != 0 && distancec2d(worldspace_pos, player -> e.position) > player -> range * 16){
             rendering_draw_text("Range!", g_video_mode.ui_scale, g_def_font, {172, 50, 50}, Coord2d{x + 6, y + 8});
         }
 
@@ -124,7 +123,7 @@ int main(int argc, char* argv[]){
         double speed = (input_get_key(GLFW_KEY_LEFT_SHIFT) && player -> stamina != 0) ? player -> run_speed : player -> walk_speed;
         double dx = speed * ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0));
         double dy = speed * ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0));
-        player -> e.transform.velocity = {dx, dy};
+        player -> e.velocity = {dx, dy};
 
         if(input_get_key_down(GLFW_KEY_F3)){
             g_debug = !g_debug;
@@ -172,11 +171,7 @@ int main(int argc, char* argv[]){
 void tick(){
     entity_tick();
     ui_tick();
-    g_save -> player_position = Coord2i{(int)player -> e.transform.position.x , (int)player -> e.transform.position.y};
-}
-
-Texture* texture_callback(Chunk* c){
-    return terr;
+    g_save -> s.player_position = Coord2i{(int)player -> e.position.x , (int)player -> e.position.y};
 }
 
 
