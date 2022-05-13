@@ -162,5 +162,4 @@ typedef struct Entity_Bone{
     }
 }Entity_Bone;
 
-
 #endif //MINICRAFT_CB_MINICRAFT_ENTITIES_H

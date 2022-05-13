@@ -11,6 +11,30 @@
 void entity_tick_callback(Entity* e){
 }
 
+Entity* entity_create_from_type(uint e){
+    switch(e){
+        case ENT_GENERIC:
+            return entity_create(new Entity());
+
+        case ENT_PLAYER:
+            return entity_create((Entity*)new Entity_Player());
+
+        case ENT_ENEMY:
+            return entity_create((Entity*)new Entity_Enemy());
+
+        case ENT_ZOMBIE:
+            return entity_create((Entity*)new Entity_Zombie());
+
+        case ENT_SKELETON:
+            return entity_create((Entity*)new Entity_Skeleton());
+
+        case ENT_BONE:
+            return entity_create((Entity*)new Entity_Bone());
+    }
+
+    error("Invd. Entity Type", "Invalid entity type id.");
+}
+
 void entity_tick_player(Entity* e){
     Entity_Player* player = (Entity_Player*)e;
 

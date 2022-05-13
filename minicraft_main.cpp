@@ -10,7 +10,7 @@
 
 Save* g_save = nullptr;
 std::string g_game_path;
-bool g_debug = true;
+Option g_debug = true;
 
 void tick();
 
@@ -21,7 +21,7 @@ int main(int argc, char* argv[]){
 
     g_save = world_load_game(0);
 
-    GLFWwindow* windowptr = rendering_init_opengl(320, 240, 1, 1, 1, "Minicraft");
+    GLFWwindow* windowptr = rendering_init_opengl(320, 200, 1, 1, 1, "Minicraft", true);
 
     //Load textures
     Font* font = new Font{
@@ -33,17 +33,17 @@ int main(int argc, char* argv[]){
     Texture* ui   = texture_load_bmp(get_resource_path(g_game_path, "resources/ui.bmp"), TEXTURE_MULTIPLE, 8);
     Texture* ent  = texture_load_bmp(get_resource_path(g_game_path, "resources/entity.bmp"), TEXTURE_MULTIPLE, 16);
 
-    player = (Entity_Player*) entity_create( (Entity*)new Entity_Player); //Entity 0
+    player = (Entity_Player*)entity_create_from_type(ENT_PLAYER);
     player -> e.position = Coord2d{(double)g_save->s.player_position.x, (double)g_save->s.player_position.y};
     player -> e.map = g_save -> overworld;
 
-    Entity_Skeleton* zambabe = (Entity_Skeleton*) entity_create( (Entity*)new Entity_Skeleton );
-    zambabe -> e.e.position = Coord2d{(double)g_save->s.player_position.x - 64, (double)g_save->s.player_position.y};
-    zambabe -> e.e.map = g_save -> overworld;
+    Entity* zambabe = entity_create_from_type(ENT_SKELETON);
+    zambabe -> position = Coord2d{(double)g_save->s.player_position.x - 64, (double)g_save->s.player_position.y};
+    zambabe -> map = g_save -> overworld;
 
-    Entity_Zombie* zambabe2 = (Entity_Zombie*) entity_create( (Entity*)new Entity_Zombie );
-    zambabe2 -> e.e.position = Coord2d{(double)g_save->s.player_position.x + 16, (double)g_save->s.player_position.y};
-    zambabe2 -> e.e.map = g_save -> overworld;
+    Entity* zambabe2 = entity_create_from_type(ENT_ZOMBIE);
+    zambabe2 -> position = Coord2d{(double)g_save->s.player_position.x + 16, (double)g_save->s.player_position.y};
+    zambabe2 -> map = g_save -> overworld;
 
     //Disable Vsync
     glfwSwapInterval(0);
@@ -74,8 +74,6 @@ int main(int argc, char* argv[]){
     ui_dynamic_panel_activate((Panel*)fps_display);
     ui_dynamic_panel_activate(health_bar);
     ui_dynamic_panel_activate(stamina_bar);
-
-    int test = player -> e.atlas_index;
 
     while(!glfwWindowShouldClose(windowptr)){
         input_poll_input();

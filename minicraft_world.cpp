@@ -17,6 +17,7 @@ enum Material{
 };
 
 enum{
+    VOID,
     GRASS,
     TREE_BASE,
     TREE_TOP,
@@ -51,6 +52,7 @@ enum{
                   Texture   Options                         DropID  DropCount */
 
         //Background Tiles
+        VOID_TILE,
         {0,        0,                                  0,      0}, //Grass
         {1,        TILE_SOLID,                         0,      0}, //Tree_Base
         {2,        TILE_SOLID,                         0,      0}, //Tree_Top
@@ -229,7 +231,7 @@ Save* world_load_game(uint id){
         world_map_write(map1);
 
         //Copy resources
-        std::filesystem::copy_file(get_resource_path(g_game_path, "resources/terrain.bmp").c_str(), get_resource_path(g_game_path, "maps/" + std::to_string(map1 -> id) + ".map/texture.bmp").c_str());
+        std::filesystem::copy_file(get_resource_path(g_game_path, "resources/terrain.bmp").c_str(), get_resource_path(g_game_path, "maps/map" + std::to_string(map1 -> id) + "/texture.bmp").c_str());
         map = map1;
     }
 
