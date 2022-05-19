@@ -23,10 +23,14 @@ typedef struct Structure{
     uchar* tiles;
 } Structure;
 
-typedef struct Save{
-    std::string world_name;
+typedef struct Save_Data{
     Coord2i player_position;
     long seed;
+} Save_Data;
+
+typedef struct Save{
+    Save_Data s;
+    Map* overworld;
 } Save;
 
 typedef struct Item{
@@ -38,9 +42,10 @@ extern Save*      g_save;
 extern Structure* g_structures[255];
 
 //Functions
-Chunk*  world_load_chunk(Coord2i coord);
-void    world_unload_chunk(Chunk* chunk);
-Save*   world_load_game(const std::string& world_name);
+Chunk*  world_load_chunk(Map* map, Coord2i coord);
+void    world_unload_chunk(Map* map, Chunk* chunk);
+
+Save*   world_load_game(uint id);
 void    world_save_game(Save* save);
 
 
