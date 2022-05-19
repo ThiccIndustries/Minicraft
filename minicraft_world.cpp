@@ -57,7 +57,7 @@ enum{
         {1,        TILE_SOLID,                         0,      0}, //Tree_Base
         {2,        TILE_SOLID,                         0,      0}, //Tree_Top
 
-        {6,        TILE_SOLID,                         0,      0}, //Water
+        {18,       TILE_ANIMATED,                       0,      0}, //Water
 
         {3,        TILE_SOLID,                         0,      0}, //Water_Corner_UL
         {3,        TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_Corner_UR
@@ -78,18 +78,18 @@ enum{
         {13,       TILE_SOLID,                         0,     0}, //Water_ICorner_DL
         {13,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_ICorner_DR
 
-        {14,       TILE_SOLID,                         0,      0}, //Water_U_Top
+        {6,        TILE_SOLID,                         0,      0}, //Water_U_Top
         {15,       TILE_SOLID,                         0,      0}, //Water_U_Bottom
         {20,       TILE_SOLID,                         0,      0}, //Water_U_L
         {20,       TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_U_R
 
-        {22,       TILE_SOLID,                         0,      0}, //Water_U_Corner_Top
+        {14,       TILE_SOLID,                         0,      0}, //Water_U_Corner_Top
         {7,        TILE_SOLID,                         0,      0}, //Water_U_Corner_Bottom
         {21,       TILE_SOLID,                         0,      0}, //Water_U_Corner_L
         {21,       TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_U_Corner_R
 
         //Collectables
-        {8,        TILE_COLLECTABLE,                   1,      1}, //Flower
+        {16,       TILE_COLLECTABLE,                   1,      1}, //Flower
         {9,        TILE_COLLECTABLE,                   2,      1}, //Lily
         {10,       TILE_SOLID | TILE_COLLECTABLE,      3,      1}, //Wood
         {16,       TILE_COLLECTABLE | TILE_ANIMATED,   4,      1}, //Dead_Zombie
@@ -117,6 +117,7 @@ Chunk* world_load_chunk(Map* map, Coord2i coord){
                 }
             }
             uint tile = GRASS;
+            uint otile = 0;
 
             if (water[4])
                 tile = WATER;
@@ -124,71 +125,71 @@ Chunk* world_load_chunk(Map* map, Coord2i coord){
 
             //TODO: This is the worst thing ever wow.
             //Pass 1
-            if (tile == WATER && !water[1])
-                tile = WATER_TOP;
+            if (tile == WATER && otile == 0 && !water[1])
+                otile = WATER_TOP;
 
-            if (tile == WATER && !water[7])
-                tile = WATER_BOTTOM;
+            if (tile == WATER && otile == 0  && !water[7])
+                otile = WATER_BOTTOM;
 
-            if (tile == WATER && !water[3])
-                tile = WATER_SIDE_L;
+            if (tile == WATER && otile == 0  && !water[3])
+                otile = WATER_SIDE_L;
 
-            if (tile == WATER && !water[5])
-                tile = WATER_SIDE_R;
+            if (tile == WATER && otile == 0  && !water[5])
+                otile = WATER_SIDE_R;
 
             //Pass 2
-            if (tile == WATER_TOP && !water[3] && water[5] && water[7])
-                tile = WATER_CORNER_UL;
+            if (otile == WATER_TOP && !water[3] && water[5] && water[7])
+                otile = WATER_CORNER_UL;
 
-            if (tile == WATER_TOP && !water[5] && water[3] && water[7])
-                tile = WATER_CORNER_UR;
+            if (otile == WATER_TOP && !water[5] && water[3] && water[7])
+                otile = WATER_CORNER_UR;
 
-            if (tile == WATER_BOTTOM && !water[3] && water[5] && water[1])
-                tile = WATER_CORNER_DL;
+            if (otile == WATER_BOTTOM && !water[3] && water[5] && water[1])
+                otile = WATER_CORNER_DL;
 
-            if (tile == WATER_BOTTOM && !water[5] && water[3] && water[1])
-                tile = WATER_CORNER_DR;
+            if (otile == WATER_BOTTOM && !water[5] && water[3] && water[1])
+                otile = WATER_CORNER_DR;
 
-            if (tile == WATER_TOP && !water[3] && !water[5])
-                tile = WATER_U_TOP;
+            if (otile == WATER_TOP && !water[3] && !water[5])
+                otile = WATER_U_TOP;
 
-            if (tile == WATER_BOTTOM && !water[3] && !water[5])
-                tile = WATER_U_BOTTOM;
+            if (otile == WATER_BOTTOM && !water[3] && !water[5])
+                otile = WATER_U_BOTTOM;
 
-            if (tile == WATER_TOP && !water[1] && !water[7] && water[5])
-                tile = WATER_U_L;
+            if (otile == WATER_TOP && !water[1] && !water[7] && water[5])
+                otile = WATER_U_L;
 
-            if (tile == WATER_TOP && !water[1] && !water[7] && water[3])
-                tile = WATER_U_R;
+            if (otile == WATER_TOP && !water[1] && !water[7] && water[3])
+                otile = WATER_U_R;
 
-            if (tile == WATER && !water[0] && water[2] && water[6])
-                tile = WATER_ICORNER_UL;
+            if (tile == WATER && otile == 0 && !water[0] && water[2] && water[6])
+                otile = WATER_ICORNER_UL;
 
-            if (tile == WATER && !water[2] && water[0] && water[8])
-                tile = WATER_ICORNER_UR;
+            if (tile == WATER && otile == 0 && !water[2] && water[0] && water[8])
+                otile = WATER_ICORNER_UR;
 
-            if (tile == WATER && !water[6] && water[8] && water[0])
-                tile = WATER_ICORNER_DL;
+            if (tile == WATER && otile == 0 && !water[6] && water[8] && water[0])
+                otile = WATER_ICORNER_DL;
 
-            if (tile == WATER && !water[8] && water[6] && water[2])
-                tile = WATER_ICORNER_DR;
+            if (tile == WATER && otile == 0 && !water[8] && water[6] && water[2])
+                otile = WATER_ICORNER_DR;
 
-            if (tile == WATER && !water[0] && !water[2])
-                tile = WATER_UCORNER_TOP;
+            if (tile == WATER && otile == 0 && !water[0] && !water[2])
+                otile = WATER_UCORNER_TOP;
 
-            if (tile == WATER && !water[6] && !water[8])
-                tile = WATER_UCORNER_BOTTOM;
+            if (tile == WATER && otile == 0 && !water[6] && !water[8])
+                otile = WATER_UCORNER_BOTTOM;
 
-            if (tile == WATER && water[3] && !water[6] && !water[0])
-                tile = WATER_UCORNER_L;
+            if (tile == WATER && otile == 0 && water[3] && !water[6] && !water[0])
+                otile = WATER_UCORNER_L;
 
-            if (tile == WATER && water[5] && !water[2] && !water[8])
-                tile = WATER_UCORNER_R;
+            if (tile == WATER && otile == 0 && water[5] && !water[2] && !water[8])
+                otile = WATER_UCORNER_R;
 
             chunkptr -> background_tiles[(ty * 16) + tx] = tile;
-
+            chunkptr -> overlay_tiles[(ty * 16) + tx] = otile;
             if((int) ( ((double)rand() / RAND_MAX) * 100 ) == 1  ) {
-                if(tile == WATER)
+                if(tile == WATER && otile == 0)
                     chunkptr -> overlay_tiles[(ty * 16) + tx] = LILY;
                 if(tile == GRASS)
                     chunkptr -> overlay_tiles[(ty * 16) + tx] = FLOWER;

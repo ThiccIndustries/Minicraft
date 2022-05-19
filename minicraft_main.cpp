@@ -14,9 +14,10 @@ Option g_debug = true;
 
 void tick();
 
-Entity_Player *player = nullptr;
+Entity *player = nullptr;
 
 int main(int argc, char* argv[]){
+
     g_game_path = argv[0];
 
     g_save = world_load_game(0);
@@ -33,17 +34,20 @@ int main(int argc, char* argv[]){
     Texture* ui   = texture_load_bmp(get_resource_path(g_game_path, "resources/ui.bmp"), TEXTURE_MULTIPLE, 8);
     Texture* ent  = texture_load_bmp(get_resource_path(g_game_path, "resources/entity.bmp"), TEXTURE_MULTIPLE, 16);
 
-    player = (Entity_Player*)entity_create_from_type(ENT_PLAYER);
-    player -> e.position = Coord2d{(double)g_save->s.player_position.x, (double)g_save->s.player_position.y};
-    player -> e.map = g_save -> overworld;
-
-    Entity* zambabe = entity_create_from_type(ENT_SKELETON);
-    zambabe -> position = Coord2d{(double)g_save->s.player_position.x - 64, (double)g_save->s.player_position.y};
-    zambabe -> map = g_save -> overworld;
-
-    Entity* zambabe2 = entity_create_from_type(ENT_ZOMBIE);
-    zambabe2 -> position = Coord2d{(double)g_save->s.player_position.x + 16, (double)g_save->s.player_position.y};
-    zambabe2 -> map = g_save -> overworld;
+    player = entity_create();
+    auto player_script   = entity_add_component<Player>(player);
+    auto player_col      = entity_add_component<Collider>(player);
+    auto player_renderer = entity_add_component<Renderer>(player);
+    player -> transform -> position = Coord2d{(double)g_save->s.player_position.x, (double)g_save->s.player_position.y};
+    player -> transform -> map = g_save -> overworld;
+    player->health = 10;
+    player_renderer->atlas_index = 0;
+    player_renderer->spritesheet_size = {3, 3};
+    player_renderer->frame_count = 4;
+    player_renderer->frame_order = new uint[]{0, 1, 0, 2};
+    player_renderer->animation_rate  = TIME_TPS;
+    player_col->col_bounds = {{5,10}, {11, 15}};
+    player_col->hit_bounds = {{2, 0}, {14, 15}};
 
     //Disable Vsync
     glfwSwapInterval(0);
@@ -61,13 +65,14 @@ int main(int argc, char* argv[]){
     Timer* autosave_timer = time_timer_start(TIME_TPS * 5);
 
     //Create health and stamina bars
-    Panel* health_bar = ui_create_health_bar(ui, 8, 9, 10, &(player -> e.health));
-    Panel* stamina_bar = ui_create_health_bar(ui, 16, 17, 10, &(player -> stamina));
+    Panel* health_bar = ui_create_health_bar(ui, 8, 9, 10, &(player -> health));
+    Panel* stamina_bar = ui_create_health_bar(ui, 16, 17, 10, &(player_script -> stamina));
 
     Panel_Text* fps_display = ui_create_int_display(g_def_font, "Fps: ", &(g_time -> fps), TIME_TPS / 4);
     fps_display -> p.position = {g_video_mode.window_resolution.x - (int)(font -> t -> tile_size * 10 * g_video_mode.ui_scale), 0};
     fps_display -> p.has_background = false;
     fps_display -> p.foreground_color = {255, 255, 255};
+
     health_bar -> position = {2, 2};
     stamina_bar -> position = {2, 10};
 
@@ -80,11 +85,9 @@ int main(int argc, char* argv[]){
         time_update_time(glfwGetTime());
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        world_populate_chunk_buffer((Entity*)player);
-
-        rendering_draw_chunk_buffer((Entity*)player);
-
-        rendering_draw_entities(ent,       (Entity*)player);
+        world_populate_chunk_buffer(player);
+        rendering_draw_chunk_buffer(player);
+        rendering_draw_entities(ent, player);
 
         uint cursor = 0;
         double x, y;
@@ -100,12 +103,12 @@ int main(int argc, char* argv[]){
         Coord2i tile{(int) (worldspace_pos.x - (chunk.x * 256)) / 16,
                      (int) (worldspace_pos.y - (chunk.y * 256)) / 16};
 
-        if(world_get_chunk(chunk) != nullptr && player -> e.map->tile_properties[world_get_chunk(chunk)->overlay_tiles[tile.x + (tile.y * 16)]].options & TILE_COLLECTABLE){
+        if(world_get_chunk(chunk) != nullptr && player -> transform -> map->tile_properties[world_get_chunk(chunk)->overlay_tiles[tile.x + (tile.y * 16)]].options & TILE_COLLECTABLE){
             cursor = 1;
         }
 
         rendering_draw_cursor(ui, cursor);
-        if(cursor != 0 && distancec2d(worldspace_pos, player -> e.position) > player -> range * 16){
+        if(cursor != 0 && distancec2d(worldspace_pos, player -> transform -> position) > player_script -> range * 16){
             rendering_draw_text("Range!", g_video_mode.ui_scale, g_def_font, {172, 50, 50}, Coord2d{x + 6, y + 8});
         }
 
@@ -114,14 +117,10 @@ int main(int argc, char* argv[]){
             autosave_timer = time_timer_start(TIME_TPS * 5);
         }
 
-        //rendering_draw_text("Fps:" + std::to_string(fps), g_video_mode.ui_scale, font, {255, 255, 255}, {g_video_mode.window_resolution.x - (double)(font -> t -> tile_size * 10 * g_video_mode.ui_scale), 0} );
-        rendering_draw_text(" us:" + std::to_string(ftime * 1000.0f), g_video_mode.ui_scale, font, {255, 255, 255}, {g_video_mode.window_resolution.x - (double)(font -> t -> tile_size * 10 * g_video_mode.ui_scale), 8} );
-
-
-        double speed = (input_get_key(GLFW_KEY_LEFT_SHIFT) && player -> stamina != 0) ? player -> run_speed : player -> walk_speed;
+        double speed = (input_get_key(GLFW_KEY_LEFT_SHIFT) && player_script -> stamina != 0) ? player_script -> run_speed : player_script -> walk_speed;
         double dx = speed * ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0));
         double dy = speed * ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0));
-        player -> e.velocity = {dx, dy};
+        player -> transform -> velocity = {dx, dy};
 
         if(input_get_key_down(GLFW_KEY_F3)){
             g_debug = !g_debug;
@@ -129,11 +128,11 @@ int main(int argc, char* argv[]){
         }
 
         if(input_get_button_up(GLFW_MOUSE_BUTTON_1)) {
-            time_timer_cancel(player -> collect_timer);
+            time_timer_cancel(player_script -> collect_timer);
         }
 
         if(input_get_button_down(GLFW_MOUSE_BUTTON_1)){
-            player -> collect_timer = time_timer_start(player -> collect_delay);
+            player_script -> collect_timer = time_timer_start(player_script -> collect_delay);
         }
 
         if(input_get_key_down(GLFW_KEY_ESCAPE)){
@@ -142,10 +141,10 @@ int main(int argc, char* argv[]){
         }
 
         if(input_get_key_down(GLFW_KEY_Q))
-            player -> tmp_debug = clampi(player -> tmp_debug - 1, 21, 24);
+            player_script -> tmp_debug = clampi(player_script -> tmp_debug - 1, 21, 24);
 
         if(input_get_key_down(GLFW_KEY_E))
-            player -> tmp_debug = clampi(player -> tmp_debug + 1, 21, 24);
+            player_script -> tmp_debug = clampi(player_script -> tmp_debug + 1, 21, 24);
 
 
         for(int i = 0; i <=  g_dynamic_panel_highest_id; ++i){
@@ -169,7 +168,7 @@ int main(int argc, char* argv[]){
 void tick(){
     entity_tick();
     ui_tick();
-    g_save -> s.player_position = Coord2i{(int)player -> e.position.x , (int)player -> e.position.y};
+    g_save -> s.player_position = Coord2i{(int)player -> transform -> position.x , (int)player -> transform -> position.y};
 }
 
 
