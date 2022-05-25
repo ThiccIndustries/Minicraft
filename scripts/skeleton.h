@@ -5,27 +5,31 @@
  */
 #ifndef SKELETON
 #define SKELETON
-
-#include "geode.h"
-#include "enemy.cpp"
-#include "bone.cpp"
-
 #define COMP_SKELETON 6
 
 typedef struct Skeleton{
     Enemy e;
 
     Skeleton(){
-        /*e.e.health        = 10;*/
-        e.movementSpeed = ((1.5 * 16) / TIME_TPS);
-        e.attack_range  = 5 * 16;
-        e.follow_range  = 5 * 16;
-        e.attack_time   = 64;
-        e.c.type = COMP_SKELETON;
+
+        e.c.on_create = [](Entity* e, Component* c){
+            enemy_on_create(e, c);
+            auto enemy = (Enemy*)c;
+            auto e_renderer = entity_get_component<Renderer>(e);
+            auto e_col = entity_get_component<Collider>(e);
+            enemy->attack_range = 5 * 16;
+            enemy->follow_range = 5 * 16;
+            enemy->attack_time = 64;
+            enemy->movementSpeed = ((1.5 * 16) / TIME_TPS);
+            e->health = 10;
+            e_renderer->atlas_index = 6;
+            e_renderer->spritesheet_size  = {3, 3};
+        };
 
         e.c.on_tick   = [](Entity* e, Component* c){
             Enemy* enemy = (Enemy*)c;
-            enemy -> c.on_tick(e, c);
+            enemy_on_tick(e, c);
+
             //Attack
             if(!(enemy -> attack_timer == nullptr || time_timer_finished(enemy -> attack_timer)))
                 return;
@@ -56,26 +60,12 @@ typedef struct Skeleton{
             Coord2d v = {cos(theta), sin(theta)};
 
             proj->transform->velocity = { bone -> movementSpeed * v.x, bone -> movementSpeed * v.y};
-            proj->transform->position = proj->transform->position + Coord2d{16 * v.x, 16 * v.y};
+            proj->transform->position = proj->transform->position + Coord2d{32 * v.x, 32 * v.y};
             bone -> lifetime_timer = time_timer_start(bone -> lifetime);
         };
 
         e.c.on_death   = [](Entity* e, Component* c){
-            Coord2d pos = e -> transform -> position;
-            Coord2i chunk{  (int) floor(pos.x / 256.0),
-                            (int) floor(pos.y / 256.0)};
-            Coord2i tile{(int) (pos.x - (chunk.x * 256)) / 16,
-                         (int) (pos.y - (chunk.y * 256)) / 16};
-
-            Chunk* chunkptr = world_get_chunk(chunk);
-
-            //Entity did not die offscreen
-            if(chunkptr != nullptr){
-                chunkptr -> overlay_tiles[ (tile.y * 16) + tile.x ] = 27;
-                world_chunk_refresh_metatextures(e -> transform -> map, chunkptr);
-            }
-
-            ((Enemy*)c)->c.on_death(e, c);
+            entity_delete(e->id);
         };
     }
 }Skeleton;

@@ -35,19 +35,20 @@ int main(int argc, char* argv[]){
     Texture* ent  = texture_load_bmp(get_resource_path(g_game_path, "resources/entity.bmp"), TEXTURE_MULTIPLE, 16);
 
     player = entity_create();
-    auto player_script   = entity_add_component<Player>(player);
-    auto player_col      = entity_add_component<Collider>(player);
-    auto player_renderer = entity_add_component<Renderer>(player);
+    entity_add_component<Collider>(player);
+    entity_add_component<Renderer>(player);
+    auto player_script = entity_add_component<Player>(player);
+
+    //Skeleton
+    Entity* skeleton = entity_create();
+    entity_add_component<Collider>(skeleton);
+    entity_add_component<Renderer>(skeleton);
+    entity_add_component<Skeleton>(skeleton);
+    skeleton -> transform -> position = Coord2d{(double)g_save->s.player_position.x - 64, (double)g_save->s.player_position.y};
+    skeleton -> transform -> map = g_save -> overworld;
+
     player -> transform -> position = Coord2d{(double)g_save->s.player_position.x, (double)g_save->s.player_position.y};
     player -> transform -> map = g_save -> overworld;
-    player->health = 10;
-    player_renderer->atlas_index = 0;
-    player_renderer->spritesheet_size = {3, 3};
-    player_renderer->frame_count = 4;
-    player_renderer->frame_order = new uint[]{0, 1, 0, 2};
-    player_renderer->animation_rate  = TIME_TPS;
-    player_col->col_bounds = {{5,10}, {11, 15}};
-    player_col->hit_bounds = {{2, 0}, {14, 15}};
 
     //Disable Vsync
     glfwSwapInterval(0);

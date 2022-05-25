@@ -14,15 +14,7 @@
 
 #define TILE_COLLECTABLE TILE_LAST << 1
 
-//Entities
-#include "minicraft_entities.h"
-
-//Structures
-typedef struct Structure{
-    Coord2i size;
-    uchar* tiles;
-} Structure;
-
+//Fuck header files
 typedef struct Save_Data{
     Coord2i player_position;
     long seed;
@@ -32,6 +24,12 @@ typedef struct Save{
     Save_Data s;
     Map* overworld;
 } Save;
+
+//Structures
+typedef struct Structure{
+    Coord2i size;
+    uchar* tiles;
+} Structure;
 
 typedef struct Item{
     uint atlas_index;
@@ -48,5 +46,6 @@ void    world_unload_chunk(Map* map, Chunk* chunk);
 Save*   world_load_game(uint id);
 void    world_save_game(Save* save);
 
-
+//Entities
+#include "minicraft_entities.h"
 #endif

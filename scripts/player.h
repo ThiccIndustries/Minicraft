@@ -6,8 +6,6 @@
 
 #ifndef PLAYER
 #define PLAYER
-
-#include "geode.h"
 #define COMP_PLAYER 3
 
 typedef struct Player{
@@ -36,6 +34,21 @@ typedef struct Player{
         collect_timer = time_timer_start(0);
         attack_timer  = time_timer_start(0);
         c.type = COMP_PLAYER;
+
+        c.on_create = [](Entity* e, Component* c){
+            auto player = e;
+            auto player_renderer = entity_get_component<Renderer>(e);
+            auto player_col = entity_get_component<Collider>(e);
+
+            player->health = 10;
+            player_renderer->atlas_index = 0;
+            player_renderer->spritesheet_size = {3, 3};
+            player_renderer->frame_count = 4;
+            player_renderer->frame_order = new uint[]{0, 1, 0, 2};
+            player_renderer->animation_rate  = TIME_TPS;
+            player_col->col_bounds = {{5,10}, {11, 15}};
+            player_col->hit_bounds = {{2, 0}, {14, 15}};
+        };
 
         c.on_tick  = [](Entity* e, Component* c){
             Player* player = (Player*)c;
@@ -66,8 +79,8 @@ typedef struct Player{
         c.on_death = [](Entity* e, Component* c){
             Player* player = (Player*)c;
             Transform* transform = e -> transform;
-            Renderer* renderer = (Renderer*)entity_get_component(e, COMP_RENDERER);
-            Collider* collider = (Collider*)entity_get_component(e, COMP_COLLIDER);
+            Renderer* renderer = entity_get_component<Renderer>(e);
+            Collider* collider = entity_get_component<Collider>(e);
             e -> health = -1;
 
             int atlas_index = renderer -> atlas_index + 27;

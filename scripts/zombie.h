@@ -8,10 +8,6 @@
 
 #ifndef ZOMBIE
 #define ZOMBIE
-
-#include "geode.h"
-#include "enemy.cpp"
-
 #define COMP_ZOMBIE 5
 
 typedef struct Zombie{
@@ -26,7 +22,8 @@ typedef struct Zombie{
 
         e.c.on_tick   = [](Entity* e, Component* c){
             Enemy* enemy = (Enemy*)c;
-            enemy -> c.on_tick(e,c);
+            enemy_on_tick(e, c);
+
             if(enemy -> target == nullptr)
                 return;
 
@@ -35,7 +32,7 @@ typedef struct Zombie{
             if(targetDist < enemy -> attack_range){
                 if(enemy -> attack_timer == nullptr || time_timer_finished(enemy -> attack_timer)) {
                     enemy->attack_timer = time_timer_start(enemy->attack_time);
-                    Entity *hit = entity_hit((Collider*)(entity_get_component(e, COMP_COLLIDER)), e->transform);
+                    Entity *hit = entity_hit(entity_get_component<Collider>(e), e->transform);
                     if (hit == enemy -> target) {
                         entity_damage(hit, enemy->damage);
                     }
@@ -58,7 +55,7 @@ typedef struct Zombie{
                 world_chunk_refresh_metatextures(e->transform->map, chunkptr);
             }
 
-            ((Enemy*)c) -> c.on_death(e,c);
+            entity_delete(e -> id);
         };
     };
 }Zombie;

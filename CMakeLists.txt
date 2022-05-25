@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
 SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 SET(CMAKE_C_FLAGS_DEBUG "-O0 -g")
 
-add_executable(Minicraft minicraft.h minicraft_main.cpp minicraft_world.cpp minicraft_entities.h scripts/player.cpp scripts/enemy.cpp scripts/zombie.cpp scripts/skeleton.cpp scripts/bone.cpp)
+add_executable(Minicraft minicraft.h minicraft_main.cpp minicraft_world.cpp)
 target_link_libraries(Minicraft Geode-Lib)
 
 add_custom_command( TARGET Minicraft PRE_BUILD

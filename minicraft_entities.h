@@ -7,11 +7,11 @@
 #ifndef MINICRAFT_CB_MINICRAFT_ENTITIES_H
 #define MINICRAFT_CB_MINICRAFT_ENTITIES_H
 
-#include "geode.h"
-#include "scripts/player.cpp"
-#include "scripts/bone.cpp"
-#include "scripts/enemy.cpp"
-#include "scripts/skeleton.cpp"
-#include "scripts/zombie.cpp"
+#include "minicraft.h"
+#include "scripts/player.h"
+#include "scripts/bone.h"
+#include "scripts/enemy.h"
+#include "scripts/skeleton.h"
+#include "scripts/zombie.h"
 
 #endif //MINICRAFT_CB_MINICRAFT_ENTITIES_H
