@@ -6,7 +6,7 @@
 #ifndef ENEMY
 #define ENEMY
 
-#define COMP_ENEMY 4
+#define COMP_ENEMY 6
 
 //Because this component is a "template" for the scripts Zombie and Skeleton, the functions need to be named in-order to be called later
 void enemy_on_create(Entity* e, Component* c);
@@ -20,8 +20,8 @@ typedef struct Enemy{
     uint    follow_range;
     uint    damage;
     double  attack_time;
-    Timer*  attack_timer = nullptr;
-    Entity* target = nullptr;
+    Timer*  attack_timer;
+    Entity* target;
 
     Enemy() {
         damage = 2;
@@ -40,6 +40,10 @@ typedef struct Enemy{
 inline void enemy_on_create(Entity* e, Component* c) {
     auto e_renderer = entity_get_component<Renderer>(e);
     auto e_col = entity_get_component<Collider>(e);
+    auto e_e = (Enemy*)c;
+
+    e_e -> attack_timer = nullptr;
+    e_e -> target = nullptr;
     e_renderer->frame_count = 4;
     e_renderer->frame_order = new uint[]{0, 1, 0, 2};
     e_renderer->animation_rate = TIME_TPS;

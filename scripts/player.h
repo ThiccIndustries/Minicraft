@@ -6,7 +6,7 @@
 
 #ifndef PLAYER
 #define PLAYER
-#define COMP_PLAYER 3
+#define COMP_PLAYER 5
 
 typedef struct Player{
     Component c;
@@ -30,19 +30,21 @@ typedef struct Player{
         collect_delay = TIME_TPS / 4;
         attack_delay  = TIME_TPS / 4;
 
-        stamina_timer = time_timer_start(0);
-        collect_timer = time_timer_start(0);
-        attack_timer  = time_timer_start(0);
         c.type = COMP_PLAYER;
 
         c.on_create = [](Entity* e, Component* c){
             auto player = e;
             auto player_renderer = entity_get_component<Renderer>(e);
             auto player_col = entity_get_component<Collider>(e);
+            auto player_cmp = (Player*)c;
+            player_cmp -> stamina_timer = time_timer_start(0);
+            player_cmp -> collect_timer = time_timer_start(0);
+            player_cmp -> attack_timer  = time_timer_start(0);
 
             player->health = 10;
-            player_renderer->atlas_index = 0;
-            player_renderer->spritesheet_size = {3, 3};
+            player_renderer->atlas_texture =
+                    texture_load(get_resource_path(g_game_path, "resources/entities/player.bmp"), TEXTURE_MULTIPLE, 16);
+            player_renderer->sheet_type = SHEET_UDH;
             player_renderer->frame_count = 4;
             player_renderer->frame_order = new uint[]{0, 1, 0, 2};
             player_renderer->animation_rate  = TIME_TPS;
@@ -74,6 +76,11 @@ typedef struct Player{
 
                 player->stamina_timer = time_timer_start(TIME_TPS);
             }
+
+            double speed = (input_get_key(GLFW_KEY_LEFT_SHIFT) && player -> stamina != 0) ? player -> run_speed : player -> walk_speed;
+            double dx = speed * ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0));
+            double dy = speed * ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0));
+            e -> transform -> velocity = {dx, dy};
         };
 
         c.on_death = [](Entity* e, Component* c){
@@ -83,9 +90,10 @@ typedef struct Player{
             Collider* collider = entity_get_component<Collider>(e);
             e -> health = -1;
 
-            int atlas_index = renderer -> atlas_index + 27;
             transform -> velocity = {0, 0};
-            renderer -> atlas_index = atlas_index;
+            transform -> direction = DIRECTION_SOUTH;
+            transform -> move_state = ENT_STATE_STATIONARY;
+            renderer -> atlas_index = 9;
             collider -> col_bounds = {};
             collider -> hit_bounds = {};
             renderer -> animation_rate = 9999;

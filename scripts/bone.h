@@ -6,7 +6,7 @@
 #ifndef BONE
 #define BONE
 
-#define COMP_BONE 7
+#define COMP_BONE 9
 
 typedef struct Bone{
     Component c;
@@ -19,15 +19,19 @@ typedef struct Bone{
     Bone() {
         movementSpeed   = ((5.0 * 16) / TIME_TPS);
         lifetime        = 2 * TIME_TPS;
-        lifetime_timer  = nullptr;
-        target          = nullptr;
         c.type = COMP_BONE;
 
         c.on_create = [](Entity* e, Component* c){
             auto e_renderer = entity_get_component<Renderer>(e);
             auto e_col = entity_get_component<Collider>(e);
-            e_renderer->atlas_index = 36;
-            e_renderer->spritesheet_size = {1, 2};
+            auto bone = (Bone*)c;
+
+            bone -> lifetime_timer = nullptr;
+            bone -> target = nullptr;
+
+            e_renderer->atlas_texture =
+                    texture_load(get_resource_path(g_game_path, "resources/entities/bone.bmp"), TEXTURE_MULTIPLE, 16);
+            e_renderer->sheet_type = SHEET_SINGLE;
             e_renderer->frame_count = 2;
             e_renderer->frame_order = new uint[]{0, 1};
             e_renderer->animation_rate = TIME_TPS / 4;
@@ -58,7 +62,7 @@ typedef struct Bone{
 
             if(time_timer_finished( bone -> lifetime_timer )) {
                 entity_kill(e);
-                return; //TODO: Redundant? I guess if I ever add a new condition it would prevent a crash in case i forget.
+                return;
             }
         };
 
@@ -70,7 +74,7 @@ typedef struct Bone{
             Collider* collider = entity_get_component<Collider>(e);
 
             //Use tick to "randomly" assign sprite
-            int atlas_index = (g_time -> tick % 2 == 0) ? 37 : 46;
+            int atlas_index = (g_time -> tick % 2 == 0) ? 1 : 3;
             transform -> velocity = {0, 0};
             renderer -> atlas_index = atlas_index;
             transform -> direction = DIRECTION_SOUTH;

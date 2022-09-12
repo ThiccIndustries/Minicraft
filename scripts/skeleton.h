@@ -19,11 +19,13 @@ typedef struct Skeleton{
             auto e_col = entity_get_component<Collider>(e);
             enemy->attack_range = 5 * 16;
             enemy->follow_range = 5 * 16;
-            enemy->attack_time = 64;
+            enemy->attack_time = TIME_TPS;
             enemy->movementSpeed = ((1.5 * 16) / TIME_TPS);
             e->health = 10;
-            e_renderer->atlas_index = 6;
-            e_renderer->spritesheet_size  = {3, 3};
+            e_renderer->atlas_texture =
+                    texture_load(get_resource_path(g_game_path, "resources/entities/skeleton.bmp"), TEXTURE_MULTIPLE,
+                                 16);
+            e_renderer->sheet_type = SHEET_UDH;
         };
 
         e.c.on_tick   = [](Entity* e, Component* c){

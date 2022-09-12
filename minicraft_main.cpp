@@ -17,7 +17,6 @@ void tick();
 Entity *player = nullptr;
 
 int main(int argc, char* argv[]){
-
     g_game_path = argv[0];
 
     g_save = world_load_game(0);
@@ -26,13 +25,12 @@ int main(int argc, char* argv[]){
 
     //Load textures
     Font* font = new Font{
-            texture_load_bmp(get_resource_path(g_game_path, "resources/font.bmp"), TEXTURE_MULTIPLE, 8),
+            texture_load(get_resource_path(g_game_path, "resources/font.bmp"), TEXTURE_MULTIPLE, 8),
             R"(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!"#$%&'()*+,-./:;<=>?@[\]^_ {|}~0123456789)"
     };
     g_def_font = font;
 
-    Texture* ui   = texture_load_bmp(get_resource_path(g_game_path, "resources/ui.bmp"), TEXTURE_MULTIPLE, 8);
-    Texture* ent  = texture_load_bmp(get_resource_path(g_game_path, "resources/entity.bmp"), TEXTURE_MULTIPLE, 16);
+    Texture* ui = texture_load(get_resource_path(g_game_path, "resources/ui.bmp"), TEXTURE_MULTIPLE, 8);
 
     player = entity_create();
     entity_add_component<Collider>(player);
@@ -44,11 +42,10 @@ int main(int argc, char* argv[]){
     entity_add_component<Collider>(skeleton);
     entity_add_component<Renderer>(skeleton);
     entity_add_component<Skeleton>(skeleton);
-    skeleton -> transform -> position = Coord2d{(double)g_save->s.player_position.x - 64, (double)g_save->s.player_position.y};
-    skeleton -> transform -> map = g_save -> overworld;
 
-    player -> transform -> position = Coord2d{(double)g_save->s.player_position.x, (double)g_save->s.player_position.y};
-    player -> transform -> map = g_save -> overworld;
+    skeleton -> transform -> map = g_save -> map;
+    player -> transform -> position = Coord2d{(double)g_save->player_position.x, (double)g_save->player_position.y};
+    player -> transform -> map = g_save -> map;
 
     //Disable Vsync
     glfwSwapInterval(0);
@@ -66,10 +63,10 @@ int main(int argc, char* argv[]){
     Timer* autosave_timer = time_timer_start(TIME_TPS * 5);
 
     //Create health and stamina bars
-    Panel* health_bar = ui_create_health_bar(ui, 8, 9, 10, &(player -> health));
-    Panel* stamina_bar = ui_create_health_bar(ui, 16, 17, 10, &(player_script -> stamina));
+    Panel* health_bar = uix_create_health_bar(ui, 8, 9, 10, &(player -> health));
+    Panel* stamina_bar = uix_create_health_bar(ui, 16, 17, 10, &(player_script -> stamina));
 
-    Panel_Text* fps_display = ui_create_int_display(g_def_font, "Fps: ", &(g_time -> fps), TIME_TPS / 4);
+    Panel_Text* fps_display = uix_create_int_display(g_def_font, "Fps: ", &(g_time -> fps), TIME_TPS / 4);
     fps_display -> p.position = {g_video_mode.window_resolution.x - (int)(font -> t -> tile_size * 10 * g_video_mode.ui_scale), 0};
     fps_display -> p.has_background = false;
     fps_display -> p.foreground_color = {255, 255, 255};
@@ -82,13 +79,14 @@ int main(int argc, char* argv[]){
     ui_dynamic_panel_activate(stamina_bar);
 
     while(!glfwWindowShouldClose(windowptr)){
+
+
         input_poll_input();
         time_update_time(glfwGetTime());
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         world_populate_chunk_buffer(player);
         rendering_draw_chunk_buffer(player);
-        rendering_draw_entities(ent, player);
+        rendering_draw_entities(player);
 
         uint cursor = 0;
         double x, y;
@@ -118,10 +116,6 @@ int main(int argc, char* argv[]){
             autosave_timer = time_timer_start(TIME_TPS * 5);
         }
 
-        double speed = (input_get_key(GLFW_KEY_LEFT_SHIFT) && player_script -> stamina != 0) ? player_script -> run_speed : player_script -> walk_speed;
-        double dx = speed * ((input_get_key(GLFW_KEY_D) ? 1 : 0) - (input_get_key(GLFW_KEY_A) ? 1 : 0));
-        double dy = speed * ((input_get_key(GLFW_KEY_S) ? 1 : 0) - (input_get_key(GLFW_KEY_W) ? 1 : 0));
-        player -> transform -> velocity = {dx, dy};
 
         if(input_get_key_down(GLFW_KEY_F3)){
             g_debug = !g_debug;
@@ -158,7 +152,6 @@ int main(int argc, char* argv[]){
         glfwSwapBuffers(windowptr);
     }
     world_save_game(g_save);
-
     entity_delete(0); //Delete player
     glfwDestroyWindow(windowptr); //Destroy window
     glfwTerminate();
@@ -169,7 +162,7 @@ int main(int argc, char* argv[]){
 void tick(){
     entity_tick();
     ui_tick();
-    g_save -> s.player_position = Coord2i{(int)player -> transform -> position.x , (int)player -> transform -> position.y};
+    g_save -> player_position = Coord2i{(int)player -> transform -> position.x , (int)player -> transform -> position.y};
 }
 
 

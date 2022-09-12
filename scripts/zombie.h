@@ -8,7 +8,7 @@
 
 #ifndef ZOMBIE
 #define ZOMBIE
-#define COMP_ZOMBIE 5
+#define COMP_ZOMBIE 7
 
 typedef struct Zombie{
     Enemy e;

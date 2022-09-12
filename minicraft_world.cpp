@@ -50,52 +50,50 @@ enum{
     Block* tile_properties = new Block[]{
         /*        Tile Definitions
                   Texture   Options                         DropID  DropCount */
-
         //Background Tiles
-        VOID_TILE,
-        {0,        0,                                  0,      0}, //Grass
-        {1,        TILE_SOLID,                         0,      0}, //Tree_Base
-        {2,        TILE_SOLID,                         0,      0}, //Tree_Top
+            VOID_TILE,
+            {0,        0,                                  0,      0}, //Grass
+            {1,        TILE_SOLID,                         0,      0}, //Tree_Base
+            {2,        TILE_SOLID,                         0,      0}, //Tree_Top
 
-        {18,       TILE_ANIMATED,                       0,      0}, //Water
+            {18,       TILE_ANIMATED,                       0,      0}, //Water
 
-        {3,        TILE_SOLID,                         0,      0}, //Water_Corner_UL
-        {3,        TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_Corner_UR
+            {3,        TILE_SOLID,                         0,      0}, //Water_Corner_UL
+            {3,        TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_Corner_UR
 
-        {4,        TILE_SOLID,                         0,      0}, //Water_Top
+            {4,        TILE_SOLID,                         0,      0}, //Water_Top
 
-        {5,        TILE_SOLID,                         0,      0}, //Water_ICorner_UL
-        {5,        TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_ICorner_UR
+            {5,        TILE_SOLID,                         0,      0}, //Water_ICorner_UL
+            {5,        TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_ICorner_UR
 
-        {11,       TILE_SOLID,                         0,     0}, //Water_Side_L
-        {11,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_Side_R
+            {11,       TILE_SOLID,                         0,     0}, //Water_Side_L
+            {11,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_Side_R
 
-        {19,       TILE_SOLID,                         0,     0}, //Water_Corner_DL
-        {19,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_Corner_DR
+            {19,       TILE_SOLID,                         0,     0}, //Water_Corner_DL
+            {19,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_Corner_DR
 
-        {12,       TILE_SOLID,                         0,     0}, //Water_Bottom
+            {12,       TILE_SOLID,                         0,     0}, //Water_Bottom
 
-        {13,       TILE_SOLID,                         0,     0}, //Water_ICorner_DL
-        {13,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_ICorner_DR
+            {13,       TILE_SOLID,                         0,     0}, //Water_ICorner_DL
+            {13,       TILE_SOLID | TILE_TEX_FLIP_X,       0,     0}, //Water_ICorner_DR
 
-        {6,        TILE_SOLID,                         0,      0}, //Water_U_Top
-        {15,       TILE_SOLID,                         0,      0}, //Water_U_Bottom
-        {20,       TILE_SOLID,                         0,      0}, //Water_U_L
-        {20,       TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_U_R
+            {6,        TILE_SOLID,                         0,      0}, //Water_U_Top
+            {15,       TILE_SOLID,                         0,      0}, //Water_U_Bottom
+            {20,       TILE_SOLID,                         0,      0}, //Water_U_L
+            {20,       TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_U_R
 
-        {14,       TILE_SOLID,                         0,      0}, //Water_U_Corner_Top
-        {7,        TILE_SOLID,                         0,      0}, //Water_U_Corner_Bottom
-        {21,       TILE_SOLID,                         0,      0}, //Water_U_Corner_L
-        {21,       TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_U_Corner_R
+            {14,       TILE_SOLID,                         0,      0}, //Water_U_Corner_Top
+            {7,        TILE_SOLID,                         0,      0}, //Water_U_Corner_Bottom
+            {21,       TILE_SOLID,                         0,      0}, //Water_U_Corner_L
+            {21,       TILE_SOLID | TILE_TEX_FLIP_X,       0,      0}, //Water_U_Corner_R
 
-        //Collectables
-        {16,       TILE_COLLECTABLE,                   1,      1}, //Flower
-        {9,        TILE_COLLECTABLE,                   2,      1}, //Lily
-        {10,       TILE_SOLID | TILE_COLLECTABLE,      3,      1}, //Wood
-        {16,       TILE_COLLECTABLE | TILE_ANIMATED,   4,      1}, //Dead_Zombie
-        {17,       TILE_COLLECTABLE,                   5,      1}, //Bone fragments
-};
-
+//Collectables
+            {16,       TILE_COLLECTABLE,                   1,      1}, //Flower
+            {9,        TILE_COLLECTABLE,                   2,      1}, //Lily
+            {10,       TILE_SOLID | TILE_COLLECTABLE,      3,      1}, //Wood
+            {16,       TILE_COLLECTABLE | TILE_ANIMATED,   4,      1}, //Dead_Zombie
+            {17,       TILE_COLLECTABLE,                   5,      1}, //Bone fragments
+    };
 
 Chunk* world_load_chunk(Map* map, Coord2i coord){
     Chunk* chunkptr = world_chunkfile_read(map, coord );
@@ -106,7 +104,8 @@ Chunk* world_load_chunk(Map* map, Coord2i coord){
     chunkptr = new Chunk;
     //Generate chunk
     siv::PerlinNoise noise;
-    noise.reseed(g_save -> s.seed);
+    noise.reseed(g_save -> seed);
+
     for (int tx = 0; tx < 16; ++tx) {
         for (int ty = 0; ty < 16; ++ty) {
             bool water[9] = {false};
@@ -122,8 +121,7 @@ Chunk* world_load_chunk(Map* map, Coord2i coord){
             if (water[4])
                 tile = WATER;
 
-
-            //TODO: This is the worst thing ever wow.
+            //TODO: This is the worst thing ever(?)
             //Pass 1
             if (tile == WATER && otile == 0 && !water[1])
                 otile = WATER_TOP;
@@ -211,8 +209,26 @@ void world_unload_chunk(Map* map, Chunk* chunk){
     world_chunkfile_write(map, chunk);
 }
 
-void  world_save_game(Save* save){
-    write_map_resource(save -> overworld, "save.dat", &(save -> s), sizeof(Save_Data));
+void world_save_game(Save *save) {
+    //level.ntn
+    NTN_File* level = ntn_open_file(save->map, "level");
+    if(level == nullptr){
+        error("Corrupt map.", "level.ntn did not exist for existing map.");
+        return;
+    }
+    ntn_set_int(level, "seed", save -> seed);
+    ntn_write_file(save -> map, level);
+
+    //player.ntn
+    NTN_File* player = ntn_open_file(save->map, "player");
+    if(player == nullptr){
+        error("Corrupt map.", "player.ntn did not exist for existing map.");
+        return;
+    }
+    ntn_set_int(player, "position/x", save -> player_position.x);
+    ntn_set_int(player, "position/y", save -> player_position.y);
+
+    ntn_write_file(save -> map, player);
 }
 
 
@@ -221,13 +237,12 @@ Save* world_load_game(uint id){
     Map* map = world_map_read(id);
 
     if(map == nullptr){
-        Texture* terr = texture_load_bmp(get_resource_path(g_game_path, "resources/terrain.bmp"), TEXTURE_MULTIPLE | TEXTURE_STORE, 16);
+        Texture* terr = texture_load(get_resource_path(g_game_path, "resources/terrain.bmp"), TEXTURE_MULTIPLE | TEXTURE_STORE, 16);
 
         Map* map1 = new Map;
         map1 -> id = id;
         map1 -> tilemap = terr;
         map1 -> tile_count = 29;
-        std::cout << sizeof(*tile_properties) << " : " << sizeof(Block) << std::endl;
         map1 -> tile_properties = tile_properties;
         world_map_write(map1);
 
@@ -236,13 +251,34 @@ Save* world_load_game(uint id){
         map = map1;
     }
 
-    Save_Data s;
-    s.player_position = {0, 0};
-    s.seed = std::time(0);
+    save -> map = map;
 
-    read_map_resource(map, "save.dat", &s, sizeof(Save_Data));
+    NTN_File* level = ntn_open_file(map, "level");
+    NTN_File* player = ntn_open_file(map, "player");
 
-    save -> s = s;
-    save -> overworld = map;
+    //Create new level file
+    if(level == nullptr){
+        int seed = (int)std::time(nullptr);
+
+        level = ntn_create_file("level");
+        level = ntn_add(level, NTN_Int, "seed", new int{seed});
+        ntn_write_file(map, level);
+    }
+
+    save -> seed = ntn_get_int(level, "seed");
+
+    //Create new player file
+    if(player == nullptr){
+        player = ntn_create_file("player");
+        player = ntn_add(player, NTN_Root, "position", nullptr);
+        player = ntn_add(player, NTN_Int, "position/x", new int{0});
+        player = ntn_add(player, NTN_Int, "position/y", new int{0});
+        ntn_write_file(map, player);
+    }
+
+    save -> player_position.x = ntn_get_int(player, "position/x");
+    save -> player_position.y = ntn_get_int(player, "position/y");
+
     return save;
 }
+
